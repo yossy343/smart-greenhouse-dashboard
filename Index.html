@@ -1,0 +1,3346 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Greenhouse Light Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                "Noto Sans Thai",
+                sans-serif;
+
+            background: #f4f6f8;
+
+            color: #222;
+        }
+
+        .container {
+
+            max-width: 1450px;
+
+            margin: auto;
+
+            padding: 20px;
+        }
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .header h1 {
+
+            margin: 0 0 5px 0;
+
+            font-size: 28px;
+        }
+
+        .header p {
+
+            margin: 0;
+
+            color: #666;
+        }
+
+        .status {
+
+            margin-top: 10px;
+
+            font-size: 14px;
+
+            color: #666;
+        }
+
+        /* =====================================================
+           SELECTOR
+        ===================================================== */
+
+        .selector-panel {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .selector-title {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-bottom: 15px;
+        }
+
+        .selector-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr 1fr;
+
+            gap: 20px;
+        }
+
+        .selector-group {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+        .selector-group label {
+
+            font-size: 14px;
+
+            color: #555;
+
+            margin-bottom: 7px;
+        }
+
+        .selector-group select,
+        .selector-group input {
+
+            width: 100%;
+
+            padding: 10px 12px;
+
+            font-size: 16px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 8px;
+
+            background: white;
+        }
+
+        .selector-group select:focus,
+        .selector-group input:focus {
+
+            outline: none;
+
+            border-color: #1976d2;
+        }
+
+        /* =====================================================
+           SUMMARY
+        ===================================================== */
+
+        .summary-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 20px;
+        }
+
+        .card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+
+            font-size: 14px;
+
+            color: #666;
+
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+
+            font-size: 30px;
+
+            font-weight: bold;
+        }
+
+        .card-unit {
+
+            font-size: 14px;
+
+            color: #777;
+
+            margin-left: 5px;
+        }
+
+        /* =====================================================
+           DAILY STATISTICS
+        ===================================================== */
+
+        .section-title {
+
+            font-size: 19px;
+
+            font-weight: bold;
+
+            margin:
+                10px 0
+                15px 0;
+        }
+
+        .stats-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(6, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 16px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-label {
+
+            font-size: 13px;
+
+            color: #777;
+
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+
+            font-size: 21px;
+
+            font-weight: bold;
+        }
+
+        /* =====================================================
+           DETAILS
+        ===================================================== */
+
+        .detail-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 18px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .detail-label {
+
+            font-size: 13px;
+
+            color: #777;
+
+            margin-bottom: 7px;
+        }
+
+        .detail-value {
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+        /* =====================================================
+           DATA INFO
+        ===================================================== */
+
+        .data-info {
+
+            background: white;
+
+            padding: 15px 20px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.08);
+
+            color: #666;
+
+            font-size: 14px;
+        }
+
+        /* =====================================================
+           CHART
+        ===================================================== */
+
+        .chart-card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-title {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-bottom: 15px;
+        }
+
+        .chart-container {
+
+            width: 100%;
+
+            height: 380px;
+
+            position: relative;
+        }
+
+        canvas {
+
+            width: 100%;
+
+            height: 100%;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .stats-grid {
+
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+        }
+
+        @media (max-width: 1000px) {
+
+            .summary-grid,
+            .detail-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 750px) {
+
+            .selector-grid,
+            .summary-grid,
+            .detail-grid,
+            .stats-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+            .header h1 {
+
+                font-size: 22px;
+            }
+
+            .card-value {
+
+                font-size: 25px;
+            }
+
+            .chart-container {
+
+                height: 300px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="header">
+
+        <h1>
+            Smart Greenhouse Light Dashboard
+        </h1>
+
+        <p>
+            ESP32 + BH1750 Light Monitoring System
+        </p>
+
+        <div
+            class="status"
+            id="connectionStatus">
+
+            Connecting...
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SELECTOR
+    ====================================================== -->
+
+    <div class="selector-panel">
+
+        <div class="selector-title">
+
+            Greenhouse / Sensor / Date Selection
+
+        </div>
+
+
+        <div class="selector-grid">
+
+
+            <!-- GREENHOUSE -->
+
+            <div class="selector-group">
+
+                <label for="greenhouseSelect">
+
+                    Greenhouse
+
+                </label>
+
+                <select id="greenhouseSelect">
+
+                    <option value="">
+
+                        Loading...
+
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- SENSOR -->
+
+            <div class="selector-group">
+
+                <label for="sensorSelect">
+
+                    Sensor
+
+                </label>
+
+                <select id="sensorSelect">
+
+                    <option value="">
+
+                        Select sensor
+
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div class="selector-group">
+
+                <label for="dateSelect">
+
+                    Date
+
+                </label>
+
+                <input
+                    type="date"
+                    id="dateSelect">
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CURRENT SUMMARY
+    ====================================================== -->
+
+    <div class="summary-grid">
+
+
+        <div class="card">
+
+            <div class="card-title">
+
+                Current Light
+
+            </div>
+
+            <div class="card-value">
+
+                <span id="luxValue">
+                    --
+                </span>
+
+                <span class="card-unit">
+                    lux
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+
+                PPFD
+
+            </div>
+
+            <div class="card-value">
+
+                <span id="ppfdValue">
+                    --
+                </span>
+
+                <span class="card-unit">
+                    µmol/m²/s
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+
+                DLI Today
+
+            </div>
+
+            <div class="card-value">
+
+                <span id="dliValue">
+                    --
+                </span>
+
+                <span class="card-unit">
+                    mol/m²/day
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+
+                Sensor
+
+            </div>
+
+            <div
+                class="card-value"
+                style="font-size:22px;">
+
+                <span id="sensorValue">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         DAILY STATISTICS
+    ====================================================== -->
+
+    <div class="section-title">
+
+        Daily Statistics
+
+    </div>
+
+
+    <div class="stats-grid">
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                Lux Minimum
+            </div>
+
+            <div
+                class="stat-value"
+                id="luxMin">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                Lux Average
+            </div>
+
+            <div
+                class="stat-value"
+                id="luxAvg">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                Lux Maximum
+            </div>
+
+            <div
+                class="stat-value"
+                id="luxMax">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                PPFD Minimum
+            </div>
+
+            <div
+                class="stat-value"
+                id="ppfdMin">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                PPFD Average
+            </div>
+
+            <div
+                class="stat-value"
+                id="ppfdAvg">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                PPFD Maximum
+            </div>
+
+            <div
+                class="stat-value"
+                id="ppfdMax">
+                --
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         DETAILS
+    ====================================================== -->
+
+    <div class="detail-grid">
+
+
+        <div class="detail-item">
+
+            <div class="detail-label">
+
+                Selected Date
+
+            </div>
+
+            <div
+                class="detail-value"
+                id="selectedDateText">
+
+                --
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <div class="detail-label">
+
+                Latest ΔDLI
+
+            </div>
+
+            <div class="detail-value">
+
+                <span id="detailDeltaDLI">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <div class="detail-label">
+
+                Last Update
+
+            </div>
+
+            <div class="detail-value">
+
+                <span id="detailTimestamp">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <div class="detail-label">
+
+                Data Records
+
+            </div>
+
+            <div class="detail-value">
+
+                <span id="recordCount">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         DATA INFO
+    ====================================================== -->
+
+    <div class="data-info">
+
+        <strong>Data source:</strong>
+
+        Supabase PostgreSQL
+
+        &nbsp; | &nbsp;
+
+        <strong>Timezone:</strong>
+
+        Asia/Bangkok
+
+        &nbsp; | &nbsp;
+
+        <strong>Refresh:</strong>
+
+        5 seconds
+
+    </div>
+
+
+    <!-- =====================================================
+         LIGHT CHART
+    ====================================================== -->
+
+    <div class="chart-card">
+
+        <div class="chart-title">
+
+            Light Intensity History
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="lightChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DLI CHART
+    ====================================================== -->
+
+    <div class="chart-card">
+
+        <div class="chart-title">
+
+            DLI Accumulation
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="dliChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   SUPABASE CONFIGURATION
+========================================================= */
+
+const SUPABASE_URL =
+    "https://scjmrpfuybnejbasfzqm.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_Bsv9RezOrhGXSco9X-SA4g_FAWkS4wZ";
+
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const LUX_TO_PPFD = 0.0185;
+
+const PAGE_SIZE = 1000;
+
+const HISTORY_REFRESH_INTERVAL = 60000;
+
+
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
+
+let selectedGreenhouseID = null;
+
+let selectedSensorID = null;
+
+let selectedSensorCode = "";
+
+let selectedSensorType = "";
+
+let selectedDate = "";
+
+let historyData = [];
+
+let lastHistoryLoadTime = 0;
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const greenhouseSelect =
+    document.getElementById(
+        "greenhouseSelect"
+    );
+
+
+const sensorSelect =
+    document.getElementById(
+        "sensorSelect"
+    );
+
+
+const dateSelect =
+    document.getElementById(
+        "dateSelect"
+    );
+
+
+const connectionStatus =
+    document.getElementById(
+        "connectionStatus"
+    );
+
+
+/* =========================================================
+   DATE FUNCTIONS
+========================================================= */
+
+function getTodayThailand() {
+
+    const now = new Date();
+
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone:
+                    "Asia/Bangkok",
+
+                year: "numeric",
+
+                month: "2-digit",
+
+                day: "2-digit"
+            }
+        ).formatToParts(now);
+
+
+    let year = "";
+
+    let month = "";
+
+    let day = "";
+
+
+    parts.forEach(
+        part => {
+
+            if (
+                part.type === "year"
+            ) {
+
+                year = part.value;
+
+            }
+
+            if (
+                part.type === "month"
+            ) {
+
+                month = part.value;
+
+            }
+
+            if (
+                part.type === "day"
+            ) {
+
+                day = part.value;
+
+            }
+
+        }
+    );
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+/*
+    Convert Thai date to UTC boundaries.
+
+    Example:
+
+    2026-09-16
+
+    Thailand:
+
+    2026-09-16 00:00:00
+    to
+    2026-09-17 00:00:00
+
+    UTC:
+
+    2026-09-15 17:00:00
+    to
+    2026-09-16 17:00:00
+*/
+
+function getUTCDateRange(
+    thaiDate
+) {
+
+    const start =
+        new Date(
+            `${thaiDate}T00:00:00+07:00`
+        );
+
+
+    const nextDay =
+        new Date(start);
+
+    nextDay.setUTCDate(
+        nextDay.getUTCDate() + 1
+    );
+
+
+    return {
+
+        start:
+            start.toISOString(),
+
+        end:
+            nextDay.toISOString()
+
+    };
+
+}
+
+
+/* =========================================================
+   SUPABASE FETCH
+========================================================= */
+
+async function fetchSupabase(
+    url,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            url,
+            {
+
+                ...options,
+
+                headers: {
+
+                    "apikey":
+                        SUPABASE_KEY,
+
+                    "Authorization":
+                        "Bearer " +
+                        SUPABASE_KEY,
+
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
+
+
+    if (!response.ok) {
+
+        const errorText =
+            await response.text();
+
+        throw new Error(
+
+            "Supabase Error: " +
+
+            response.status +
+
+            " " +
+
+            errorText
+
+        );
+
+    }
+
+
+    return await response.json();
+
+}
+
+
+/* =========================================================
+   PAGINATED SENSOR DATA
+========================================================= */
+
+async function fetchSensorHistory() {
+
+    if (
+        !selectedSensorID ||
+        !selectedDate
+    ) {
+
+        return [];
+
+    }
+
+
+    const range =
+        getUTCDateRange(
+            selectedDate
+        );
+
+
+    let allData = [];
+
+    let start = 0;
+
+
+    while (true) {
+
+
+        const url =
+
+            SUPABASE_URL +
+
+            "/rest/v1/sensor_data" +
+
+            "?select=*" +
+
+            "&sensor_id=eq." +
+
+            selectedSensorID +
+
+            "&timestamp=gte." +
+
+            encodeURIComponent(
+                range.start
+            ) +
+
+            "&timestamp=lt." +
+
+            encodeURIComponent(
+                range.end
+            ) +
+
+            "&order=timestamp.asc";
+
+
+        const response =
+            await fetch(
+                url,
+                {
+
+                    method:
+                        "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Range":
+                            `${start}-${start + PAGE_SIZE - 1}`,
+
+                        "Prefer":
+                            "count=exact"
+
+                    }
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(
+
+                "History Error: " +
+
+                response.status +
+
+                " " +
+
+                errorText
+
+            );
+
+        }
+
+
+        const page =
+            await response.json();
+
+
+        if (
+            !Array.isArray(page) ||
+            page.length === 0
+        ) {
+
+            break;
+
+        }
+
+
+        allData =
+            allData.concat(page);
+
+
+        if (
+            page.length < PAGE_SIZE
+        ) {
+
+            break;
+
+        }
+
+
+        start += PAGE_SIZE;
+
+
+        /*
+            Safety limit.
+
+            1 day at 5 sec:
+
+            17,280 records
+
+            This limit allows
+            much more than that.
+        */
+
+        if (
+            start > 100000
+        ) {
+
+            console.warn(
+                "History reached safety limit."
+            );
+
+            break;
+
+        }
+
+    }
+
+
+    return allData;
+
+}
+
+
+/* =========================================================
+   GREENHOUSE
+========================================================= */
+
+async function loadGreenhouses() {
+
+    const url =
+
+        SUPABASE_URL +
+
+        "/rest/v1/greenhouse" +
+
+        "?select=id,greenhouse_code,greenhouse_name" +
+
+        "&order=id.asc";
+
+
+    const data =
+        await fetchSupabase(url);
+
+
+    greenhouseSelect.innerHTML =
+        "";
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        greenhouseSelect.innerHTML =
+
+            '<option value="">No greenhouse</option>';
+
+        sensorSelect.innerHTML =
+
+            '<option value="">No sensor</option>';
+
+        return;
+
+    }
+
+
+    data.forEach(
+        greenhouse => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                greenhouse.id;
+
+
+            option.textContent =
+
+                greenhouse.greenhouse_name
+
+                    ?
+
+                greenhouse.greenhouse_code +
+                " - " +
+                greenhouse.greenhouse_name
+
+                    :
+
+                greenhouse.greenhouse_code;
+
+
+            greenhouseSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    selectedGreenhouseID =
+        Number(
+            data[0].id
+        );
+
+
+    greenhouseSelect.value =
+        selectedGreenhouseID;
+
+
+    await loadSensors(
+        selectedGreenhouseID
+    );
+
+}
+
+
+/* =========================================================
+   SENSOR
+========================================================= */
+
+async function loadSensors(
+    greenhouseID
+) {
+
+    const url =
+
+        SUPABASE_URL +
+
+        "/rest/v1/sensor" +
+
+        "?select=id,sensor_code,greenhouse_id,sensor_type,description" +
+
+        "&greenhouse_id=eq." +
+
+        greenhouseID +
+
+        "&order=id.asc";
+
+
+    const data =
+        await fetchSupabase(url);
+
+
+    sensorSelect.innerHTML =
+        "";
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        sensorSelect.innerHTML =
+
+            '<option value="">No sensor</option>';
+
+
+        selectedSensorID =
+            null;
+
+
+        historyData = [];
+
+
+        clearDashboard();
+
+
+        return;
+
+    }
+
+
+    data.forEach(
+        sensor => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                sensor.id;
+
+
+            option.dataset.code =
+                sensor.sensor_code;
+
+
+            option.dataset.type =
+                sensor.sensor_type || "";
+
+
+            option.textContent =
+
+                sensor.description
+
+                    ?
+
+                sensor.sensor_code +
+                " - " +
+                sensor.description
+
+                    :
+
+                sensor.sensor_code;
+
+
+            sensorSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    selectedSensorID =
+        Number(
+            data[0].id
+        );
+
+
+    selectedSensorCode =
+        data[0].sensor_code;
+
+
+    selectedSensorType =
+        data[0].sensor_type || "";
+
+
+    sensorSelect.value =
+        selectedSensorID;
+
+
+    await loadHistoryAndUpdate();
+
+}
+
+
+/* =========================================================
+   LATEST
+========================================================= */
+
+async function loadLatest() {
+
+    if (!selectedSensorID) {
+
+        return;
+
+    }
+
+
+    const url =
+
+        SUPABASE_URL +
+
+        "/rest/v1/sensor_data" +
+
+        "?select=*" +
+
+        "&sensor_id=eq." +
+
+        selectedSensorID +
+
+        "&order=timestamp.desc" +
+
+        "&limit=1";
+
+
+    const data =
+        await fetchSupabase(url);
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        clearCurrentValues();
+
+        return;
+
+    }
+
+
+    const row =
+        data[0];
+
+
+    const lux =
+        Number(
+            row.lux || 0
+        );
+
+
+    const ppfd =
+        Number(
+            row.ppfd || 0
+        );
+
+
+    const dli =
+        Number(
+            row.dli_today || 0
+        );
+
+
+    document.getElementById(
+        "luxValue"
+    ).textContent =
+        lux.toFixed(2);
+
+
+    document.getElementById(
+        "ppfdValue"
+    ).textContent =
+        ppfd.toFixed(2);
+
+
+    document.getElementById(
+        "dliValue"
+    ).textContent =
+        dli.toFixed(6);
+
+
+    document.getElementById(
+        "sensorValue"
+    ).textContent =
+        selectedSensorCode;
+
+
+    document.getElementById(
+        "detailTimestamp"
+    ).textContent =
+        formatThaiTimestamp(
+            row.timestamp
+        );
+
+
+    /*
+        ΔDLI from selected day's data
+    */
+
+    if (
+        historyData.length >= 2
+    ) {
+
+        const last =
+            historyData[
+                historyData.length - 1
+            ];
+
+
+        const previous =
+            historyData[
+                historyData.length - 2
+            ];
+
+
+        const delta =
+
+            Number(
+                last.dli_today || 0
+            )
+
+            -
+
+            Number(
+                previous.dli_today || 0
+            );
+
+
+        document.getElementById(
+            "detailDeltaDLI"
+        ).textContent =
+
+            delta.toExponential(6);
+
+    }
+
+    else {
+
+        document.getElementById(
+            "detailDeltaDLI"
+        ).textContent =
+            "--";
+
+    }
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+async function loadHistory() {
+
+    if (
+        !selectedSensorID ||
+        !selectedDate
+    ) {
+
+        historyData = [];
+
+        return;
+
+    }
+
+
+    historyData =
+        await fetchSensorHistory();
+
+
+    lastHistoryLoadTime =
+        Date.now();
+
+
+    updateDailyStatistics();
+
+
+    drawLightChart();
+
+    drawDLIChart();
+
+
+    document.getElementById(
+        "recordCount"
+    ).textContent =
+        historyData.length
+            .toLocaleString();
+
+
+    document.getElementById(
+        "selectedDateText"
+    ).textContent =
+        formatThaiDate(
+            selectedDate
+        );
+
+}
+
+
+/* =========================================================
+   LOAD HISTORY + LATEST
+========================================================= */
+
+async function loadHistoryAndUpdate() {
+
+    try {
+
+        connectionStatus.textContent =
+            "Loading data...";
+
+
+        await loadHistory();
+
+
+        await loadLatest();
+
+
+        connectionStatus.textContent =
+
+            "Connected • Data updated";
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        connectionStatus.textContent =
+            "Connection Error";
+
+    }
+
+}
+
+
+/* =========================================================
+   DAILY STATISTICS
+========================================================= */
+
+function updateDailyStatistics() {
+
+    if (
+        !historyData ||
+        historyData.length === 0
+    ) {
+
+        setText(
+            "luxMin",
+            "--"
+        );
+
+        setText(
+            "luxAvg",
+            "--"
+        );
+
+        setText(
+            "luxMax",
+            "--"
+        );
+
+        setText(
+            "ppfdMin",
+            "--"
+        );
+
+        setText(
+            "ppfdAvg",
+            "--"
+        );
+
+        setText(
+            "ppfdMax",
+            "--"
+        );
+
+        return;
+
+    }
+
+
+    const luxValues =
+        historyData
+
+            .map(
+                row =>
+                    Number(
+                        row.lux
+                    )
+            )
+
+            .filter(
+                value =>
+                    isFinite(value)
+            );
+
+
+    const ppfdValues =
+        historyData
+
+            .map(
+                row =>
+                    Number(
+                        row.ppfd
+                    )
+            )
+
+            .filter(
+                value =>
+                    isFinite(value)
+            );
+
+
+    if (
+        luxValues.length > 0
+    ) {
+
+        const luxMin =
+            Math.min(
+                ...luxValues
+            );
+
+
+        const luxMax =
+            Math.max(
+                ...luxValues
+            );
+
+
+        const luxAvg =
+            luxValues.reduce(
+                (
+                    sum,
+                    value
+                ) =>
+                    sum + value,
+                0
+            )
+            /
+            luxValues.length;
+
+
+        setText(
+            "luxMin",
+            luxMin.toFixed(2)
+        );
+
+
+        setText(
+            "luxAvg",
+            luxAvg.toFixed(2)
+        );
+
+
+        setText(
+            "luxMax",
+            luxMax.toFixed(2)
+        );
+
+    }
+
+
+    if (
+        ppfdValues.length > 0
+    ) {
+
+        const ppfdMin =
+            Math.min(
+                ...ppfdValues
+            );
+
+
+        const ppfdMax =
+            Math.max(
+                ...ppfdValues
+            );
+
+
+        const ppfdAvg =
+            ppfdValues.reduce(
+                (
+                    sum,
+                    value
+                ) =>
+                    sum + value,
+                0
+            )
+            /
+            ppfdValues.length;
+
+
+        setText(
+            "ppfdMin",
+            ppfdMin.toFixed(2)
+        );
+
+
+        setText(
+            "ppfdAvg",
+            ppfdAvg.toFixed(2)
+        );
+
+
+        setText(
+            "ppfdMax",
+            ppfdMax.toFixed(2)
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+function clearCurrentValues() {
+
+    setText(
+        "luxValue",
+        "--"
+    );
+
+    setText(
+        "ppfdValue",
+        "--"
+    );
+
+    setText(
+        "dliValue",
+        "--"
+    );
+
+    setText(
+        "sensorValue",
+        selectedSensorCode || "--"
+    );
+
+    setText(
+        "detailDeltaDLI",
+        "--"
+    );
+
+    setText(
+        "detailTimestamp",
+        "--"
+    );
+
+}
+
+
+function clearDashboard() {
+
+    historyData = [];
+
+    clearCurrentValues();
+
+    updateDailyStatistics();
+
+    drawLightChart();
+
+    drawDLIChart();
+
+
+    setText(
+        "recordCount",
+        "0"
+    );
+
+}
+
+
+/* =========================================================
+   FORMAT DATE
+========================================================= */
+
+function formatThaiDate(
+    dateString
+) {
+
+    if (!dateString) {
+
+        return "--";
+
+    }
+
+
+    const date =
+        new Date(
+            `${dateString}T00:00:00+07:00`
+        );
+
+
+    return date.toLocaleDateString(
+        "th-TH",
+        {
+
+            timeZone:
+                "Asia/Bangkok",
+
+            year: "numeric",
+
+            month: "long",
+
+            day: "numeric"
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FORMAT TIMESTAMP
+========================================================= */
+
+function formatThaiTimestamp(
+    timestamp
+) {
+
+    if (!timestamp) {
+
+        return "--";
+
+    }
+
+
+    const date =
+        new Date(
+            timestamp
+        );
+
+
+    return date.toLocaleString(
+        "th-TH",
+        {
+
+            timeZone:
+                "Asia/Bangkok",
+
+            year: "numeric",
+
+            month: "2-digit",
+
+            day: "2-digit",
+
+            hour: "2-digit",
+
+            minute: "2-digit",
+
+            second: "2-digit"
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FORMAT TIME
+========================================================= */
+
+function formatThaiTime(
+    timestamp
+) {
+
+    if (!timestamp) {
+
+        return "";
+
+    }
+
+
+    const date =
+        new Date(
+            timestamp
+        );
+
+
+    return date.toLocaleTimeString(
+        "th-TH",
+        {
+
+            timeZone:
+                "Asia/Bangkok",
+
+            hour: "2-digit",
+
+            minute: "2-digit"
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LIGHT CHART
+========================================================= */
+
+function drawLightChart() {
+
+    const canvas =
+        document.getElementById(
+            "lightChart"
+        );
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        rect.width * dpr;
+
+
+    canvas.height =
+        rect.height * dpr;
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+
+    const width =
+        rect.width;
+
+
+    const height =
+        rect.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if (
+        !historyData ||
+        historyData.length === 0
+    ) {
+
+        drawNoData(
+            ctx,
+            width,
+            height
+        );
+
+        return;
+
+    }
+
+
+    const luxValues =
+        historyData.map(
+            row =>
+                Number(
+                    row.lux || 0
+                )
+        );
+
+
+    const ppfdValues =
+        historyData.map(
+            row =>
+                Number(
+                    row.ppfd || 0
+                )
+        );
+
+
+    /*
+        Convert PPFD back to
+        equivalent Lux only for
+        plotting on the same axis.
+    */
+
+    const equivalentLuxValues =
+        ppfdValues.map(
+            value =>
+                value /
+                LUX_TO_PPFD
+        );
+
+
+    const allValues =
+        luxValues.concat(
+            equivalentLuxValues
+        );
+
+
+    let maxValue =
+        Math.max(
+            ...allValues
+        );
+
+
+    if (
+        !isFinite(maxValue) ||
+        maxValue <= 0
+    ) {
+
+        maxValue = 1;
+
+    }
+
+
+    maxValue *= 1.1;
+
+
+    const left = 65;
+
+    const right = 20;
+
+    const top = 35;
+
+    const bottom = 50;
+
+
+    const graphWidth =
+        width -
+        left -
+        right;
+
+
+    const graphHeight =
+        height -
+        top -
+        bottom;
+
+
+    drawGrid(
+        ctx,
+        width,
+        height,
+        left,
+        right,
+        top,
+        bottom,
+        graphWidth,
+        graphHeight,
+        maxValue,
+        false
+    );
+
+
+    drawTimeLabels(
+        ctx,
+        width,
+        height,
+        left,
+        graphWidth,
+        historyData
+    );
+
+
+    drawLine(
+    	ctx,
+    	luxValues,
+    	maxValue,
+    	left,
+    	top,
+    	graphWidth,
+    	graphHeight,
+    	"#1976d2"
+	);
+
+    drawLine(
+    	ctx,
+    	equivalentLuxValues,
+    	maxValue,
+    	left,
+    	top,
+    	graphWidth,
+    	graphHeight,
+    	"#e67e22"
+	);
+
+
+    drawLegend(
+        ctx,
+        left,
+        [
+            {
+                text: "Lux",
+                color: "#1976d2"
+            },
+            {
+                text: "PPFD",
+                color: "#e67e22"
+            }
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   DLI CHART
+========================================================= */
+
+function drawDLIChart() {
+
+    const canvas =
+        document.getElementById(
+            "dliChart"
+        );
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        rect.width * dpr;
+
+
+    canvas.height =
+        rect.height * dpr;
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+
+    const width =
+        rect.width;
+
+
+    const height =
+        rect.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if (
+        !historyData ||
+        historyData.length === 0
+    ) {
+
+        drawNoData(
+            ctx,
+            width,
+            height
+        );
+
+        return;
+
+    }
+
+
+    const values =
+        historyData.map(
+            row =>
+                Number(
+                    row.dli_today || 0
+                )
+        );
+
+
+    let maxValue =
+        Math.max(
+            ...values
+        );
+
+
+    if (
+        !isFinite(maxValue) ||
+        maxValue <= 0
+    ) {
+
+        maxValue = 1;
+
+    }
+
+
+    maxValue *= 1.1;
+
+
+    const left = 65;
+
+    const right = 20;
+
+    const top = 35;
+
+    const bottom = 50;
+
+
+    const graphWidth =
+        width -
+        left -
+        right;
+
+
+    const graphHeight =
+        height -
+        top -
+        bottom;
+
+
+    drawGrid(
+        ctx,
+        width,
+        height,
+        left,
+        right,
+        top,
+        bottom,
+        graphWidth,
+        graphHeight,
+        maxValue,
+        true
+    );
+
+
+    drawTimeLabels(
+        ctx,
+        width,
+        height,
+        left,
+        graphWidth,
+        historyData
+    );
+
+
+    drawLine(
+    	ctx,
+    	values,
+    	maxValue,
+    	left,
+    	top,
+    	graphWidth,
+    	graphHeight,
+    	"#2e7d32"
+	);
+
+
+    drawLegend(
+        ctx,
+        left,
+        [
+            {
+                text: "DLI Today",
+                color: "#2e7d32"
+            }
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+function drawGrid(
+    ctx,
+    width,
+    height,
+    left,
+    right,
+    top,
+    bottom,
+    graphWidth,
+    graphHeight,
+    maxValue,
+    isDLI
+) {
+
+    ctx.strokeStyle =
+        "#dddddd";
+
+
+    ctx.lineWidth = 1;
+
+
+    const gridCount = 5;
+
+
+    for (
+        let i = 0;
+        i <= gridCount;
+        i++
+    ) {
+
+        const y =
+
+            top +
+
+            graphHeight -
+
+            (
+                i /
+                gridCount
+            )
+
+            *
+
+            graphHeight;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            left,
+            y
+        );
+
+        ctx.lineTo(
+            width - right,
+            y
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+            "#666";
+
+
+        ctx.font =
+            "12px Arial";
+
+
+        ctx.textAlign =
+            "right";
+
+
+        const value =
+
+            maxValue *
+
+            i /
+
+            gridCount;
+
+
+        ctx.fillText(
+
+            isDLI
+
+                ?
+
+            value.toFixed(2)
+
+                :
+
+            value.toFixed(0),
+
+            left - 8,
+
+            y + 4
+
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TIME LABELS
+========================================================= */
+
+function drawTimeLabels(
+    ctx,
+    width,
+    height,
+    left,
+    graphWidth,
+    data
+) {
+
+    const pointCount =
+        data.length;
+
+
+    const labelCount =
+        Math.min(
+            12,
+            pointCount
+        );
+
+
+    ctx.fillStyle =
+        "#666";
+
+
+    ctx.font =
+        "11px Arial";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    for (
+        let i = 0;
+        i < labelCount;
+        i++
+    ) {
+
+        let index;
+
+
+        if (
+            labelCount === 1
+        ) {
+
+            index = 0;
+
+        }
+
+        else {
+
+            index =
+
+                Math.round(
+
+                    i *
+
+                    (
+                        pointCount - 1
+                    )
+
+                    /
+
+                    (
+                        labelCount - 1
+                    )
+
+                );
+
+        }
+
+
+        const x =
+
+            left +
+
+            (
+                index /
+                Math.max(
+                    pointCount - 1,
+                    1
+                )
+            )
+
+            *
+
+            graphWidth;
+
+
+        ctx.fillText(
+
+            formatThaiTime(
+                data[index].timestamp
+            ),
+
+            x,
+
+            height - 15
+
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LINE
+========================================================= */
+function drawLine(
+    ctx,
+    values,
+    maxValue,
+    left,
+    top,
+    graphWidth,
+    graphHeight,
+    lineColor
+) {
+
+    if (
+        values.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    ctx.beginPath();
+
+
+    values.forEach(
+        (
+            value,
+            index
+        ) => {
+
+            const x =
+
+                left +
+
+                (
+                    index /
+                    Math.max(
+                        values.length - 1,
+                        1
+                    )
+                )
+
+                *
+
+                graphWidth;
+
+
+            const y =
+
+                top +
+
+                graphHeight -
+
+                (
+                    value /
+                    maxValue
+                )
+
+                *
+
+                graphHeight;
+
+
+            if (
+                index === 0
+            ) {
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            }
+
+            else {
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+        Select line color according
+        to chart.
+
+        Lux chart has two lines.
+        DLI chart has one line.
+    */
+
+    if (
+        values === historyData.map(
+            row =>
+                Number(
+                    row.dli_today || 0
+                )
+        )
+    ) {
+
+        ctx.strokeStyle =
+            "#2e7d32";
+
+    }
+
+    else {
+
+        /*
+            Determine whether this
+            is the Lux line or PPFD line.
+        */
+
+        const firstValue =
+            values[0] || 0;
+
+
+        const firstLux =
+            Number(
+                historyData[0].lux || 0
+            );
+
+
+        if (
+            Math.abs(
+                firstValue -
+                firstLux
+            ) < 0.000001
+        ) {
+
+            ctx.strokeStyle =
+                "#1976d2";
+
+        }
+
+        else {
+
+            ctx.strokeStyle =
+                "#e67e22";
+
+        }
+
+    }
+
+
+    ctx.lineWidth = 2;
+
+
+    ctx.stroke();
+
+}
+
+
+/* =========================================================
+   LEGEND
+========================================================= */
+
+function drawLegend(
+    ctx,
+    left,
+    items
+) {
+
+    let x =
+        left;
+
+
+    ctx.font =
+        "13px Arial";
+
+
+    items.forEach(
+        item => {
+
+            ctx.fillStyle =
+                item.color;
+
+
+            ctx.fillRect(
+                x,
+                10,
+                12,
+                12
+            );
+
+
+            ctx.fillStyle =
+                "#333";
+
+
+            ctx.textAlign =
+                "left";
+
+
+            ctx.fillText(
+                item.text,
+                x + 18,
+                20
+            );
+
+
+            x +=
+                80 +
+                (
+                    item.text.length *
+                    5
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   NO DATA
+========================================================= */
+
+function drawNoData(
+    ctx,
+    width,
+    height
+) {
+
+    ctx.fillStyle =
+        "#777";
+
+
+    ctx.font =
+        "16px Arial";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+        "No data",
+        width / 2,
+        height / 2
+    );
+
+}
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (element) {
+
+        element.textContent =
+            value;
+
+    }
+
+}
+
+
+/* =========================================================
+   GREENHOUSE CHANGE
+========================================================= */
+
+greenhouseSelect.addEventListener(
+    "change",
+    async function () {
+
+        selectedGreenhouseID =
+            Number(
+                this.value
+            );
+
+
+        selectedSensorID =
+            null;
+
+
+        selectedSensorCode =
+            "";
+
+
+        historyData = [];
+
+
+        sensorSelect.innerHTML =
+
+            '<option value="">Loading...</option>';
+
+
+        clearDashboard();
+
+
+        await loadSensors(
+            selectedGreenhouseID
+        );
+
+    }
+);
+
+
+/* =========================================================
+   SENSOR CHANGE
+========================================================= */
+
+sensorSelect.addEventListener(
+    "change",
+    async function () {
+
+        selectedSensorID =
+            Number(
+                this.value
+            );
+
+
+        const option =
+            this.options[
+                this.selectedIndex
+            ];
+
+
+        if (option) {
+
+            selectedSensorCode =
+                option.dataset.code
+                ||
+                option.textContent;
+
+
+            selectedSensorType =
+                option.dataset.type
+                ||
+                "";
+
+        }
+
+
+        historyData = [];
+
+
+        clearDashboard();
+
+
+        await loadHistoryAndUpdate();
+
+    }
+);
+
+
+/* =========================================================
+   DATE CHANGE
+========================================================= */
+
+dateSelect.addEventListener(
+    "change",
+    async function () {
+
+        selectedDate =
+            this.value;
+
+
+        historyData = [];
+
+
+        clearDashboard();
+
+
+        if (
+            selectedSensorID &&
+            selectedDate
+        ) {
+
+            await loadHistoryAndUpdate();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function () {
+
+        drawLightChart();
+
+        drawDLIChart();
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initialize() {
+
+    try {
+
+        connectionStatus.textContent =
+            "Connecting to Supabase...";
+
+
+        /*
+            Default date =
+            today in Thailand
+        */
+
+        selectedDate =
+            getTodayThailand();
+
+
+        dateSelect.value =
+            selectedDate;
+
+
+        await loadGreenhouses();
+
+
+        if (
+            selectedSensorID
+        ) {
+
+            await loadHistoryAndUpdate();
+
+        }
+
+
+        connectionStatus.textContent =
+            "Connected • Data updated";
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "initialize():",
+            error
+        );
+
+
+        connectionStatus.textContent =
+            "Connection Error";
+
+    }
+
+}
+
+
+/* =========================================================
+   CURRENT DATA REFRESH
+   Every 5 seconds
+========================================================= */
+
+setInterval(
+    async function () {
+
+        if (
+            selectedSensorID
+        ) {
+
+            try {
+
+                /*
+                    Current value only.
+                    We do NOT reload the entire
+                    daily history every 5 seconds.
+                */
+
+                await loadLatest();
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Latest refresh:",
+                    error
+                );
+
+                connectionStatus.textContent =
+                    "Connection Error";
+
+            }
+
+        }
+
+    },
+    5000
+);
+
+
+/* =========================================================
+   HISTORY REFRESH
+   Every 60 seconds
+========================================================= */
+
+setInterval(
+    async function () {
+
+        if (
+            selectedSensorID &&
+            selectedDate ===
+                getTodayThailand()
+        ) {
+
+            try {
+
+                await loadHistory();
+
+                await loadLatest();
+
+                connectionStatus.textContent =
+                    "Connected • Data updated";
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "History refresh:",
+                    error
+                );
+
+            }
+
+        }
+
+    },
+    HISTORY_REFRESH_INTERVAL
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+initialize();
+
+
+</script>
+
+</body>
+
+</html>
