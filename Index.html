@@ -440,7 +440,6 @@
 
     <div class="cards">
 
-
         <div class="card">
 
             <div class="card-title">
@@ -516,7 +515,6 @@
 
         </div>
 
-
     </div>
 
 
@@ -525,7 +523,6 @@
     <!-- ========================================================= -->
 
     <div class="details">
-
 
         <div class="detail-card">
 
@@ -590,7 +587,6 @@
 
         </div>
 
-
     </div>
 
 
@@ -606,7 +602,6 @@
 
 
         <div class="stat-grid">
-
 
             <div class="stat-box">
 
@@ -703,7 +698,6 @@
 
             </div>
 
-
         </div>
 
     </div>
@@ -777,8 +771,6 @@
 // SUPABASE CONFIGURATION
 // ============================================================
 
-// ใส่ค่าของเดิมของอาจารย์ตรงนี้
-
 const SUPABASE_URL =
     "https://scjmrpfuybnejbasfzqm.supabase.co";
 
@@ -839,6 +831,23 @@ let latestLoading =
 
 
 // ============================================================
+// INCREMENTAL HISTORY VARIABLES
+// ============================================================
+
+let historyLastTimestamp =
+    null;
+
+let historyInitialized =
+    false;
+
+let historySensorID =
+    null;
+
+let historyDate =
+    null;
+
+
+// ============================================================
 // DOM READY
 // ============================================================
 
@@ -876,7 +885,32 @@ function initializeDate() {
 
     document.getElementById(
         "dateSelect"
-    ).value = today;
+    ).value =
+        today;
+
+}
+
+
+// ============================================================
+// RESET HISTORY STATE
+// ============================================================
+
+function resetHistoryState() {
+
+    historyData =
+        [];
+
+    historyLastTimestamp =
+        null;
+
+    historyInitialized =
+        false;
+
+    historySensorID =
+        null;
+
+    historyDate =
+        null;
 
 }
 
@@ -896,13 +930,18 @@ function setupEvents() {
 
             selectedGreenhouseID =
                 this.value
-                ? Number(this.value)
-                : null;
+                    ? Number(this.value)
+                    : null;
+
 
             console.log(
                 "Greenhouse changed:",
                 selectedGreenhouseID
             );
+
+
+            resetHistoryState();
+
 
             await loadSensors();
 
@@ -918,8 +957,9 @@ function setupEvents() {
 
             selectedSensorID =
                 this.value
-                ? Number(this.value)
-                : null;
+                    ? Number(this.value)
+                    : null;
+
 
             const sensor =
                 sensorList.find(
@@ -928,20 +968,27 @@ function setupEvents() {
                         === selectedSensorID
                 );
 
+
             selectedSensorCode =
                 sensor
                     ? sensor.sensor_code
                     : "";
+
 
             document.getElementById(
                 "sensorValue"
             ).textContent =
                 selectedSensorCode || "-";
 
+
             console.log(
                 "Sensor changed:",
                 selectedSensorID
             );
+
+
+            resetHistoryState();
+
 
             await refreshAll();
 
@@ -958,10 +1005,15 @@ function setupEvents() {
             selectedDate =
                 this.value;
 
+
             console.log(
                 "Date changed:",
                 selectedDate
             );
+
+
+            resetHistoryState();
+
 
             await refreshAll();
 
@@ -1017,12 +1069,15 @@ function getUTCDateRange(
             `${thaiDate}T00:00:00+07:00`
         );
 
+
     const end =
         new Date(start);
+
 
     end.setUTCDate(
         end.getUTCDate() + 1
     );
+
 
     return {
 
@@ -1048,8 +1103,10 @@ async function loadGreenhouses() {
             "greenhouseSelect"
         );
 
+
     select.innerHTML =
         '<option value="">Loading...</option>';
+
 
     try {
 
@@ -1058,10 +1115,12 @@ async function loadGreenhouses() {
             `?select=id,greenhouse_code,greenhouse_name` +
             `&order=id.asc`;
 
+
         console.log(
             "Loading greenhouse:",
             url
         );
+
 
         const response =
             await fetch(
@@ -1088,18 +1147,22 @@ async function loadGreenhouses() {
                 }
             );
 
+
         const text =
             await response.text();
+
 
         console.log(
             "Greenhouse HTTP:",
             response.status
         );
 
+
         console.log(
             "Greenhouse response:",
             text
         );
+
 
         if (!response.ok) {
 
@@ -1109,16 +1172,20 @@ async function loadGreenhouses() {
 
         }
 
+
         const data =
             JSON.parse(text);
+
 
         greenhouseList =
             Array.isArray(data)
                 ? data
                 : [];
 
+
         select.innerHTML =
             "";
+
 
         if (
             greenhouseList.length
@@ -1141,13 +1208,16 @@ async function loadGreenhouses() {
                         "option"
                     );
 
+
                 option.value =
                     greenhouse.id;
+
 
                 option.textContent =
                     greenhouse.greenhouse_name
                         ? `${greenhouse.greenhouse_code} - ${greenhouse.greenhouse_name}`
                         : greenhouse.greenhouse_code;
+
 
                 select.appendChild(
                     option
@@ -1159,6 +1229,7 @@ async function loadGreenhouses() {
 
         selectedGreenhouseID =
             greenhouseList[0].id;
+
 
         select.value =
             selectedGreenhouseID;
@@ -1172,7 +1243,6 @@ async function loadGreenhouses() {
 
         await loadSensors();
 
-
     }
     catch (error) {
 
@@ -1181,8 +1251,10 @@ async function loadGreenhouses() {
             error
         );
 
+
         select.innerHTML =
             '<option value="">Load error</option>';
+
 
         setStatus(
             "Greenhouse loading error",
@@ -1205,8 +1277,10 @@ async function loadSensors() {
             "sensorSelect"
         );
 
+
     select.innerHTML =
         '<option value="">Loading...</option>';
+
 
     if (
         !selectedGreenhouseID
@@ -1227,6 +1301,7 @@ async function loadSensors() {
             `?select=id,sensor_code,greenhouse_id,sensor_type,description` +
             `&greenhouse_id=eq.${selectedGreenhouseID}` +
             `&order=id.asc`;
+
 
         console.log(
             "Loading sensors:",
@@ -1295,8 +1370,10 @@ async function loadSensors() {
             select.innerHTML =
                 '<option value="">No sensor</option>';
 
+
             selectedSensorID =
                 null;
+
 
             return;
 
@@ -1311,13 +1388,16 @@ async function loadSensors() {
                         "option"
                     );
 
+
                 option.value =
                     sensor.id;
+
 
                 option.textContent =
                     sensor.description
                         ? `${sensor.sensor_code} - ${sensor.description}`
                         : sensor.sensor_code;
+
 
                 select.appendChild(
                     option
@@ -1329,6 +1409,7 @@ async function loadSensors() {
 
         selectedSensorID =
             sensorList[0].id;
+
 
         selectedSensorCode =
             sensorList[0].sensor_code;
@@ -1350,8 +1431,10 @@ async function loadSensors() {
         );
 
 
-        await refreshAll();
+        resetHistoryState();
 
+
+        await refreshAll();
 
     }
     catch (error) {
@@ -1361,8 +1444,10 @@ async function loadSensors() {
             error
         );
 
+
         select.innerHTML =
             '<option value="">Load error</option>';
+
 
         setStatus(
             "Sensor loading error",
@@ -1383,14 +1468,20 @@ async function loadLatest() {
     if (
         !selectedSensorID
     ) {
+
         return;
+
     }
+
 
     if (
         latestLoading
     ) {
+
         return;
+
     }
+
 
     latestLoading =
         true;
@@ -1437,6 +1528,7 @@ async function loadLatest() {
             const text =
                 await response.text();
 
+
             throw new Error(
                 `HTTP ${response.status}: ${text}`
             );
@@ -1473,7 +1565,6 @@ async function loadLatest() {
             latestData.timestamp
         );
 
-
     }
     catch (error) {
 
@@ -1504,11 +1595,14 @@ function updateLatestDisplay(
     const lux =
         Number(data.lux);
 
+
     const ppfd =
         Number(data.ppfd);
 
+
     const dli =
         Number(data.dli_today);
+
 
     const deltaDLI =
         Number(data.delta_dli);
@@ -1575,8 +1669,18 @@ function updateLatestDisplay(
 // ============================================================
 // FETCH SENSOR HISTORY
 // ============================================================
+//
+// incremental = false
+//      → โหลดข้อมูลทั้งวัน
+//
+// incremental = true
+//      → โหลดเฉพาะข้อมูลหลัง timestamp ล่าสุด
+//
+// ============================================================
 
-async function fetchSensorHistory() {
+async function fetchSensorHistory(
+    incremental = false
+) {
 
     if (
         !selectedSensorID
@@ -1594,6 +1698,99 @@ async function fetchSensorHistory() {
             selectedDate
         );
 
+
+    // ========================================================
+    // INCREMENTAL MODE
+    // ========================================================
+
+    if (
+        incremental
+        &&
+        historyLastTimestamp
+        &&
+        historySensorID === selectedSensorID
+        &&
+        historyDate === selectedDate
+    ) {
+
+        const url =
+            `${SUPABASE_URL}/rest/v1/sensor_data` +
+            `?select=*` +
+            `&sensor_id=eq.${selectedSensorID}` +
+            `&timestamp=gt.${encodeURIComponent(historyLastTimestamp)}` +
+            `&timestamp=lt.${encodeURIComponent(range.end)}` +
+            `&order=timestamp.asc`;
+
+
+        console.log(
+            "Incremental history request:"
+        );
+
+
+        console.log(
+            historyLastTimestamp
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`,
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    cache:
+                        "no-store"
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const text =
+                await response.text();
+
+
+            throw new Error(
+                `HTTP ${response.status}: ${text}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Incremental records:",
+            data.length
+        );
+
+
+        return Array.isArray(data)
+            ? data
+            : [];
+
+    }
+
+
+    // ========================================================
+    // FULL HISTORY MODE
+    // ========================================================
 
     let allData =
         [];
@@ -1614,7 +1811,7 @@ async function fetchSensorHistory() {
 
 
         console.log(
-            "History request:",
+            "Full history request:",
             offset
         );
 
@@ -1655,6 +1852,7 @@ async function fetchSensorHistory() {
 
             const text =
                 await response.text();
+
 
             throw new Error(
                 `HTTP ${response.status}: ${text}`
@@ -1731,7 +1929,9 @@ async function fetchSensorHistory() {
 // LOAD HISTORY + UPDATE GRAPH
 // ============================================================
 
-async function loadHistoryAndUpdate() {
+async function loadHistoryAndUpdate(
+    forceFullReload = false
+) {
 
     if (
         !selectedSensorID
@@ -1767,16 +1967,159 @@ async function loadHistoryAndUpdate() {
             performance.now();
 
 
-        historyData =
-            await fetchSensorHistory();
+        // ====================================================
+        // DETERMINE FULL / INCREMENTAL
+        // ====================================================
+
+        const needFullLoad =
+            forceFullReload
+            ||
+            !historyInitialized
+            ||
+            historySensorID !== selectedSensorID
+            ||
+            historyDate !== selectedDate;
 
 
-        console.log(
-            "History loaded:",
-            historyData.length,
-            "records"
-        );
+        // ====================================================
+        // FULL LOAD
+        // ====================================================
 
+        if (
+            needFullLoad
+        ) {
+
+            console.log(
+                "================================="
+            );
+
+
+            console.log(
+                "FULL HISTORY LOAD"
+            );
+
+
+            console.log(
+                "Sensor:",
+                selectedSensorID
+            );
+
+
+            console.log(
+                "Date:",
+                selectedDate
+            );
+
+
+            historyData =
+                await fetchSensorHistory(
+                    false
+                );
+
+
+            historyInitialized =
+                true;
+
+
+            historySensorID =
+                selectedSensorID;
+
+
+            historyDate =
+                selectedDate;
+
+
+            if (
+                historyData.length > 0
+            ) {
+
+                historyLastTimestamp =
+                    historyData[
+                        historyData.length - 1
+                    ].timestamp;
+
+            }
+            else {
+
+                historyLastTimestamp =
+                    null;
+
+            }
+
+
+            console.log(
+                "Full history loaded:",
+                historyData.length,
+                "records"
+            );
+
+        }
+
+
+        // ====================================================
+        // INCREMENTAL LOAD
+        // ====================================================
+
+        else {
+
+            console.log(
+                "================================="
+            );
+
+
+            console.log(
+                "INCREMENTAL HISTORY LOAD"
+            );
+
+
+            const newData =
+                await fetchSensorHistory(
+                    true
+                );
+
+
+            if (
+                newData.length > 0
+            ) {
+
+                historyData =
+                    historyData.concat(
+                        newData
+                    );
+
+
+                historyLastTimestamp =
+                    newData[
+                        newData.length - 1
+                    ].timestamp;
+
+
+                console.log(
+                    "New records:",
+                    newData.length
+                );
+
+
+                console.log(
+                    "Total history:",
+                    historyData.length
+                );
+
+            }
+            else {
+
+                console.log(
+                    "No new records."
+                );
+
+            }
+
+        }
+
+
+        // ====================================================
+        // UPDATE RECORD COUNT
+        // ====================================================
 
         document.getElementById(
             "recordCount"
@@ -1784,20 +2127,36 @@ async function loadHistoryAndUpdate() {
             historyData.length.toLocaleString();
 
 
+        // ====================================================
+        // UPDATE STATISTICS
+        // ====================================================
+
         updateDailyStatistics(
             historyData
         );
 
+
+        // ====================================================
+        // REDRAW LIGHT GRAPH
+        // ====================================================
 
         drawLightChart(
             historyData
         );
 
 
+        // ====================================================
+        // REDRAW DLI GRAPH
+        // ====================================================
+
         drawDLIChart(
             historyData
         );
 
+
+        // ====================================================
+        // PERFORMANCE
+        // ====================================================
 
         const elapsed =
             (
@@ -1819,6 +2178,7 @@ async function loadHistoryAndUpdate() {
             "loadHistoryAndUpdate() ERROR:",
             error
         );
+
 
         setStatus(
             "History loading error",
@@ -1854,25 +2214,31 @@ function updateDailyStatistics(
             "luxMin"
         ).textContent = "-";
 
+
         document.getElementById(
             "luxAvg"
         ).textContent = "-";
+
 
         document.getElementById(
             "luxMax"
         ).textContent = "-";
 
+
         document.getElementById(
             "ppfdMin"
         ).textContent = "-";
+
 
         document.getElementById(
             "ppfdAvg"
         ).textContent = "-";
 
+
         document.getElementById(
             "ppfdMax"
         ).textContent = "-";
+
 
         return;
 
@@ -1902,8 +2268,7 @@ function updateDailyStatistics(
 
 
     if (
-        luxValues.length
-        > 0
+        luxValues.length > 0
     ) {
 
         const luxMin =
@@ -1911,10 +2276,12 @@ function updateDailyStatistics(
                 ...luxValues
             );
 
+
         const luxMax =
             Math.max(
                 ...luxValues
             );
+
 
         const luxAvg =
             luxValues.reduce(
@@ -1947,8 +2314,7 @@ function updateDailyStatistics(
 
 
     if (
-        ppfdValues.length
-        > 0
+        ppfdValues.length > 0
     ) {
 
         const ppfdMin =
@@ -1956,10 +2322,12 @@ function updateDailyStatistics(
                 ...ppfdValues
             );
 
+
         const ppfdMax =
             Math.max(
                 ...ppfdValues
             );
+
 
         const ppfdAvg =
             ppfdValues.reduce(
@@ -2210,6 +2578,7 @@ function prepareCanvas(
     canvas.width =
         rect.width * dpr;
 
+
     canvas.height =
         rect.height * dpr;
 
@@ -2252,6 +2621,7 @@ function drawChartGrid(
     const width =
         canvas.clientWidth;
 
+
     const height =
         canvas.clientHeight;
 
@@ -2259,11 +2629,14 @@ function drawChartGrid(
     const left =
         60;
 
+
     const right =
         20;
 
+
     const top =
         25;
+
 
     const bottom =
         45;
@@ -2271,6 +2644,7 @@ function drawChartGrid(
 
     ctx.strokeStyle =
         "#e0e0e0";
+
 
     ctx.lineWidth =
         1;
@@ -2304,15 +2678,18 @@ function drawChartGrid(
 
         ctx.beginPath();
 
+
         ctx.moveTo(
             left,
             y
         );
 
+
         ctx.lineTo(
             width - right,
             y
         );
+
 
         ctx.stroke();
 
@@ -2330,8 +2707,10 @@ function drawChartGrid(
         ctx.fillStyle =
             "#607d8b";
 
+
         ctx.textAlign =
             "right";
+
 
         ctx.fillText(
             formatNumber(
@@ -2363,12 +2742,15 @@ function drawLine(
         ||
         values.length === 0
     ) {
+
         return;
+
     }
 
 
     const width =
         canvas.clientWidth;
+
 
     const height =
         canvas.clientHeight;
@@ -2377,11 +2759,14 @@ function drawLine(
     const left =
         60;
 
+
     const right =
         20;
 
+
     const top =
         25;
+
 
     const bottom =
         45;
@@ -2406,8 +2791,10 @@ function drawLine(
     ctx.strokeStyle =
         lineColor;
 
+
     ctx.lineWidth =
         2;
+
 
     ctx.beginPath();
 
@@ -2497,12 +2884,15 @@ function drawXAxis(
     if (
         data.length === 0
     ) {
+
         return;
+
     }
 
 
     const width =
         canvas.clientWidth;
+
 
     const height =
         canvas.clientHeight;
@@ -2511,8 +2901,10 @@ function drawXAxis(
     const left =
         60;
 
+
     const right =
         20;
+
 
     const bottom =
         45;
@@ -2520,6 +2912,7 @@ function drawXAxis(
 
     ctx.fillStyle =
         "#607d8b";
+
 
     ctx.textAlign =
         "center";
@@ -2611,6 +3004,7 @@ function drawLegend(
     let x =
         70;
 
+
     const y =
         12;
 
@@ -2620,6 +3014,7 @@ function drawLegend(
 
             ctx.fillStyle =
                 item.color;
+
 
             ctx.fillRect(
                 x,
@@ -2632,8 +3027,10 @@ function drawLegend(
             ctx.fillStyle =
                 "#455a64";
 
+
             ctx.textAlign =
                 "left";
+
 
             ctx.fillText(
                 item.name,
@@ -2677,8 +3074,10 @@ function drawNoData(
     ctx.fillStyle =
         "#90a4ae";
 
+
     ctx.textAlign =
         "center";
+
 
     ctx.font =
         "16px Arial";
@@ -2744,7 +3143,9 @@ function formatThaiTimestamp(
 ) {
 
     if (!timestamp) {
+
         return "-";
+
     }
 
 
@@ -2775,6 +3176,7 @@ function formatThaiTimestamp(
 
             second:
                 "2-digit"
+
         }
     ).format(
         date
@@ -2792,7 +3194,9 @@ function formatThaiTime(
 ) {
 
     if (!timestamp) {
+
         return "-";
+
     }
 
 
@@ -2811,6 +3215,7 @@ function formatThaiTime(
 
             minute:
                 "2-digit"
+
         }
     ).format(
         date
@@ -2829,19 +3234,23 @@ async function refreshAll() {
         "================================="
     );
 
+
     console.log(
         "REFRESH ALL"
     );
+
 
     console.log(
         "Sensor:",
         selectedSensorID
     );
 
+
     console.log(
         "Date:",
         selectedDate
     );
+
 
     console.log(
         "Time:",
@@ -2856,6 +3265,7 @@ async function refreshAll() {
 
 
     await loadLatest();
+
 
     await loadHistoryAndUpdate();
 
@@ -2883,11 +3293,18 @@ async function manualRefresh() {
     button.disabled =
         true;
 
+
     button.textContent =
         "Updating...";
 
 
     try {
+
+        /*
+         * Manual refresh:
+         * โหลดข้อมูลล่าสุดแบบ incremental
+         * ไม่จำเป็นต้องโหลดทั้งวันใหม่
+         */
 
         await refreshAll();
 
@@ -2904,6 +3321,7 @@ async function manualRefresh() {
 
         button.disabled =
             false;
+
 
         button.textContent =
             "Refresh";
@@ -2926,6 +3344,7 @@ function startAutoRefresh() {
         clearInterval(
             autoRefreshTimer
         );
+
 
         autoRefreshTimer =
             null;
@@ -2951,6 +3370,11 @@ function startAutoRefresh() {
             async function () {
 
                 console.log(
+                    "================================="
+                );
+
+
+                console.log(
                     "AUTO REFRESH:",
                     new Date().toLocaleTimeString()
                 );
@@ -2971,16 +3395,16 @@ function startAutoRefresh() {
 
                 try {
 
-                    // ------------------------------------------------
-                    // 1. Update current values
-                    // ------------------------------------------------
+                    // =========================================
+                    // 1. CURRENT VALUE
+                    // =========================================
 
                     await loadLatest();
 
 
-                    // ------------------------------------------------
-                    // 2. Update graph
-                    // ------------------------------------------------
+                    // =========================================
+                    // 2. GRAPH
+                    // =========================================
 
                     const today =
                         getTodayThailand();
@@ -2992,6 +3416,11 @@ function startAutoRefresh() {
                         today
                     ) {
 
+                        /*
+                         * ถ้าเป็นวันปัจจุบัน
+                         * จะใช้ incremental update
+                         */
+
                         await loadHistoryAndUpdate();
 
                     }
@@ -3001,7 +3430,6 @@ function startAutoRefresh() {
                         "Connected • Auto Refresh",
                         "normal"
                     );
-
 
                 }
                 catch (error) {
@@ -3040,10 +3468,12 @@ function setStatus(
             "statusBox"
         );
 
+
     const title =
         document.getElementById(
             "statusTitle"
         );
+
 
     const time =
         document.getElementById(
@@ -3110,6 +3540,7 @@ window.addEventListener(
                         historyData
                     );
 
+
                     drawDLIChart(
                         historyData
                     );
@@ -3138,13 +3569,21 @@ document.addEventListener(
                 "Page visible again → refresh"
             );
 
+
             await loadLatest();
+
 
             if (
                 selectedDate
                 ===
                 getTodayThailand()
             ) {
+
+                /*
+                 * ถ้า browser ถูกเปิดค้างไว้
+                 * และกลับเข้ามาอีกครั้ง
+                 * ใช้ incremental update
+                 */
 
                 await loadHistoryAndUpdate();
 
