@@ -1,751 +1,3600 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Smart Greenhouse Light Dashboard</title>
 
     <style>
-        * { box-sizing: border-box; }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            font-family: Arial, "Noto Sans Thai", sans-serif;
+            font-family: Arial, sans-serif;
             background: #f4f6f8;
             color: #222;
         }
+
+        header {
+            background: #263238;
+            color: white;
+            padding: 20px 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        header p {
+            margin: 6px 0 0;
+            color: #cfd8dc;
+        }
+
         .container {
-            max-width: 1450px;
+            max-width: 1400px;
             margin: auto;
             padding: 20px;
         }
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        .header h1 { margin: 0 0 5px 0; font-size: 28px; }
-        .header p { margin: 0; color: #666; }
-        .status { margin-top: 10px; font-size: 14px; color: #666; }
 
-        .selector-panel {
+        .control-panel {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        .selector-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-        .selector-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-        .selector-group { display: flex; flex-direction: column; }
-        .selector-group label { font-size: 14px; color: #555; margin-bottom: 7px; }
-        .selector-group select, .selector-group input {
-            width: 100%;
-            padding: 10px 12px;
-            font-size: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background: white;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        .card-title { font-size: 14px; color: #666; margin-bottom: 10px; }
-        .card-value { font-size: 30px; font-weight: bold; }
-        .card-unit { font-size: 14px; color: #777; margin-left: 5px; }
-
-        .section-title { font-size: 19px; font-weight: bold; margin: 10px 0 15px 0; }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        .stat-label { font-size: 13px; color: #777; margin-bottom: 8px; }
-        .stat-value { font-size: 21px; font-weight: bold; }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .detail-item {
-            background: white;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 18px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        .detail-label { font-size: 13px; color: #777; margin-bottom: 7px; }
-        .detail-value { font-size: 18px; font-weight: bold; }
-
-        .data-info {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            color: #666;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr)
+                180px
+                120px;
+
+            gap: 15px;
+            align-items: end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #455a64;
+        }
+
+        select,
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            background: #1976d2;
+            color: white;
+            cursor: pointer;
             font-size: 14px;
         }
 
-        .chart-card {
+        button:hover {
+            background: #1565c0;
+        }
+
+        .status {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4caf50;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .status.error {
+            border-left-color: #f44336;
+        }
+
+        .status.warning {
+            border-left-color: #ff9800;
+        }
+
+        .status-title {
+            font-weight: bold;
+        }
+
+        .status-time {
+            color: #607d8b;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card-title {
+            color: #607d8b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .card-unit {
+            font-size: 14px;
+            color: #78909c;
+            margin-left: 4px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .detail-title {
+            color: #607d8b;
+            font-size: 13px;
+        }
+
+        .detail-value {
+            margin-top: 6px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .statistics {
+            background: white;
+            border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .chart-title { font-size: 18px; font-weight: bold; }
-        .chart-container { width: 100%; height: 380px; position: relative; }
-        canvas { width: 100%; height: 100%; }
 
-        @media (max-width: 1100px) {
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-            .selector-grid { grid-template-columns: repeat(2, 1fr); }
+        .statistics h2 {
+            margin-top: 0;
+            font-size: 20px;
         }
-        @media (max-width: 750px) {
-            .selector-grid, .summary-grid, .detail-grid, .stats-grid { grid-template-columns: 1fr; }
-            .chart-container { height: 300px; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(6, 1fr);
+
+            gap: 10px;
         }
+
+        .stat-box {
+            background: #f5f7f8;
+            padding: 12px;
+            border-radius: 7px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #607d8b;
+        }
+
+        .stat-value {
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chart-container h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 360px;
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            color: #78909c;
+            font-size: 13px;
+            padding: 20px;
+        }
+
+        @media (max-width: 1000px) {
+
+            .control-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 10px;
+            }
+
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            header h1 {
+                font-size: 21px;
+            }
+
+            canvas {
+                height: 280px;
+            }
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
+<header>
+
+    <h1>
+        Smart Greenhouse Light Dashboard
+    </h1>
+
+    <p>
+        ESP32 + BH1750 Light Monitoring System [Demo]
+    </p>
+
+</header>
+
+
 <div class="container">
 
-    <div class="header">
-        <h1>Smart Greenhouse Light Dashboard</h1>
-        <p>ESP32 + BH1750 Light Monitoring System</p>
-        <div class="status" id="connectionStatus">Connecting...</div>
+
+    <!-- ========================================================= -->
+    <!-- CONTROL PANEL -->
+    <!-- ========================================================= -->
+
+    <div class="control-panel">
+
+        <div class="control-group">
+
+            <label>
+                Greenhouse
+            </label>
+
+            <select id="greenhouseSelect">
+                <option value="">
+                    Loading...
+                </option>
+            </select>
+
+        </div>
+
+
+        <div class="control-group">
+
+            <label>
+                Sensor
+            </label>
+
+            <select id="sensorSelect">
+                <option value="">
+                    Loading...
+                </option>
+            </select>
+
+        </div>
+
+
+        <div class="control-group">
+
+            <label>
+                Date
+            </label>
+
+            <input
+                type="date"
+                id="dateSelect"
+            >
+
+        </div>
+
+
+        <div class="control-group">
+
+            <label>
+                Auto Refresh
+            </label>
+
+            <select id="refreshSelect">
+
+                <option value="5000">
+                    5 seconds
+                </option>
+
+                <option value="10000" selected>
+                    10 seconds
+                </option>
+
+                <option value="30000">
+                    30 seconds
+                </option>
+
+                <option value="60000">
+                    60 seconds
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            id="refreshButton"
+            onclick="manualRefresh()"
+        >
+            Refresh
+        </button>
+
     </div>
 
-    <!-- SELECTOR -->
-    <div class="selector-panel">
-        <div class="selector-title">Greenhouse / Sensor / Mode Selection</div>
-        <div class="selector-grid">
-            <div class="selector-group">
-                <label for="greenhouseSelect">Greenhouse</label>
-                <select id="greenhouseSelect"><option value="">Loading...</option></select>
-            </div>
-            <div class="selector-group">
-                <label for="chartModeSelect">Display Mode (โหมดแสดงผล)</label>
-                <select id="chartModeSelect">
-                    <option value="single">Single Sensor (แยกเซนเซอร์)</option>
-                    <option value="compare" selected>Compare All Sensors (ซ้อนเปรียบเทียบทุกเซนเซอร์)</option>
-                </select>
-            </div>
-            <div class="selector-group" id="sensorGroup">
-                <label for="sensorSelect">Sensor</label>
-                <select id="sensorSelect"><option value="">Select sensor</option></select>
-            </div>
-            <div class="selector-group">
-                <label for="dateSelect">Date</label>
-                <input type="date" id="dateSelect">
-            </div>
+
+    <!-- ========================================================= -->
+    <!-- STATUS -->
+    <!-- ========================================================= -->
+
+    <div
+        id="statusBox"
+        class="status"
+    >
+
+        <div
+            id="statusTitle"
+            class="status-title"
+        >
+            Connecting...
         </div>
+
+        <div
+            id="statusTime"
+            class="status-time"
+        >
+            -
+        </div>
+
     </div>
 
-    <!-- CURRENT SUMMARY -->
-    <div class="summary-grid">
+
+    <!-- ========================================================= -->
+    <!-- SUMMARY CARDS -->
+    <!-- ========================================================= -->
+
+    <div class="cards">
+
         <div class="card">
-            <div class="card-title">Current Light</div>
-            <div class="card-value"><span id="luxValue">--</span><span class="card-unit">lux</span></div>
+
+            <div class="card-title">
+                Current Light
+            </div>
+
+            <div
+                class="card-value"
+                id="currentLux"
+            >
+                -
+            </div>
+
+            <span class="card-unit">
+                lux
+            </span>
+
         </div>
+
+
         <div class="card">
-            <div class="card-title">PPFD</div>
-            <div class="card-value"><span id="ppfdValue">--</span><span class="card-unit">µmol/m²/s</span></div>
+
+            <div class="card-title">
+                Current PPFD
+            </div>
+
+            <div
+                class="card-value"
+                id="currentPPFD"
+            >
+                -
+            </div>
+
+            <span class="card-unit">
+                µmol/m²/s
+            </span>
+
         </div>
+
+
         <div class="card">
-            <div class="card-title">Calculated DLI (Reset Daily)</div>
-            <div class="card-value"><span id="dliValue">--</span><span class="card-unit">mol/m²/day</span></div>
+
+            <div class="card-title">
+                DLI Today
+            </div>
+
+            <div
+                class="card-value"
+                id="currentDLI"
+            >
+                -
+            </div>
+
+            <span class="card-unit">
+                mol/m²/day
+            </span>
+
         </div>
+
+
         <div class="card">
-            <div class="card-title">Sensor / Mode</div>
-            <div class="card-value" style="font-size:20px;"><span id="sensorValue">--</span></div>
+
+            <div class="card-title">
+                Sensor
+            </div>
+
+            <div
+                class="card-value"
+                id="sensorValue"
+            >
+                -
+            </div>
+
         </div>
+
     </div>
 
-    <!-- DAILY STATISTICS -->
-    <div class="section-title">Daily Statistics</div>
-    <div class="stats-grid">
-        <div class="stat-card"><div class="stat-label">Lux Minimum</div><div class="stat-value" id="luxMin">--</div></div>
-        <div class="stat-card"><div class="stat-label">Lux Average</div><div class="stat-value" id="luxAvg">--</div></div>
-        <div class="stat-card"><div class="stat-label">Lux Maximum</div><div class="stat-value" id="luxMax">--</div></div>
-        <div class="stat-card"><div class="stat-label">PPFD Minimum</div><div class="stat-value" id="ppfdMin">--</div></div>
-        <div class="stat-card"><div class="stat-label">PPFD Average</div><div class="stat-value" id="ppfdAvg">--</div></div>
-        <div class="stat-card"><div class="stat-label">PPFD Maximum</div><div class="stat-value" id="ppfdMax">--</div></div>
-    </div>
 
+    <!-- ========================================================= -->
     <!-- DETAILS -->
-    <div class="detail-grid">
-        <div class="detail-item"><div class="detail-label">Selected Date</div><div class="detail-value" id="selectedDateText">--</div></div>
-        <div class="detail-item"><div class="detail-label">Latest ΔDLI</div><div class="detail-value"><span id="detailDeltaDLI">--</span></div></div>
-        <div class="detail-item"><div class="detail-label">Last Update</div><div class="detail-value"><span id="detailTimestamp">--</span></div></div>
-        <div class="detail-item"><div class="detail-label">Data Records</div><div class="detail-value"><span id="recordCount">--</span></div></div>
+    <!-- ========================================================= -->
+
+    <div class="details">
+
+        <div class="detail-card">
+
+            <div class="detail-title">
+                Current Lux
+            </div>
+
+            <div
+                class="detail-value"
+                id="detailLux"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-title">
+                Current PPFD
+            </div>
+
+            <div
+                class="detail-value"
+                id="detailPPFD"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-title">
+                Latest ΔDLI
+            </div>
+
+            <div
+                class="detail-value"
+                id="latestDeltaDLI"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-title">
+                Last Update
+            </div>
+
+            <div
+                class="detail-value"
+                id="lastUpdate"
+            >
+                -
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="data-info">
-        <strong>Data source:</strong> Supabase PostgreSQL &nbsp; | &nbsp;
-        <strong>Timezone:</strong> Asia/Bangkok &nbsp; | &nbsp;
-        <strong>Refresh:</strong> Auto 5s / History 60s
+
+    <!-- ========================================================= -->
+    <!-- DAILY STATISTICS -->
+    <!-- ========================================================= -->
+
+    <div class="statistics">
+
+        <h2>
+            Daily Statistics
+        </h2>
+
+
+        <div class="stat-grid">
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Lux Min
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="luxMin"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Lux Avg
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="luxAvg"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    Lux Max
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="luxMax"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    PPFD Min
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="ppfdMin"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    PPFD Avg
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="ppfdAvg"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <div class="stat-label">
+                    PPFD Max
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="ppfdMax"
+                >
+                    -
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
+
+    <!-- ========================================================= -->
     <!-- LIGHT CHART -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <div class="chart-title" id="lightChartTitle">Light Intensity Comparison</div>
-        </div>
-        <div class="chart-container">
-            <canvas id="lightChart"></canvas>
-        </div>
+    <!-- ========================================================= -->
+
+    <div class="chart-container">
+
+        <h2>
+            Light Intensity History
+        </h2>
+
+        <canvas id="lightChart"></canvas>
+
     </div>
 
+
+    <!-- ========================================================= -->
     <!-- DLI CHART -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <div class="chart-title" id="dliChartTitle">Daily DLI Accumulation (Reset @ 00:00)</div>
-        </div>
-        <div class="chart-container">
-            <canvas id="dliChart"></canvas>
-        </div>
+    <!-- ========================================================= -->
+
+    <div class="chart-container">
+
+        <h2>
+            DLI Accumulation
+        </h2>
+
+        <canvas id="dliChart"></canvas>
+
     </div>
+
+
+    <!-- ========================================================= -->
+    <!-- RECORD INFORMATION -->
+    <!-- ========================================================= -->
+
+    <div class="detail-card">
+
+        <div class="detail-title">
+            Record Count
+        </div>
+
+        <div
+            class="detail-value"
+            id="recordCount"
+        >
+            -
+        </div>
+
+    </div>
+
 
 </div>
 
+
+<div class="footer">
+
+    Smart Greenhouse Light Monitoring System
+
+</div>
+
+
+
 <script>
-/* =========================================================
-   CONFIG & GLOBAL VARIABLES
-========================================================= */
-const SUPABASE_URL = "https://scjmrpfuybnejbasfzqm.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Bsv9RezOrhGXSco9X-SA4g_FAWkS4wZ";
-const LUX_TO_PPFD = 0.0185;
-const PAGE_SIZE = 1000;
-const COLOR_PALETTE = ["#1976d2", "#e67e22", "#2e7d32", "#9c27b0", "#d32f2f", "#009688"];
 
-let selectedGreenhouseID = null;
-let selectedSensorID = null;
-let selectedSensorCode = "";
-let selectedDate = "";
-let chartMode = "compare"; // 'single' หรือ 'compare'
 
-let greenhouseSensors = []; // รายการ Sensor ทั้งหมดใน Greenhouse นั้น
-let sensorsHistoryMap = {}; // { sensor_id: [data_list] }
+// ============================================================
+// SUPABASE CONFIGURATION
+// ============================================================
 
-const greenhouseSelect = document.getElementById("greenhouseSelect");
-const sensorSelect = document.getElementById("sensorSelect");
-const chartModeSelect = document.getElementById("chartModeSelect");
-const dateSelect = document.getElementById("dateSelect");
-const connectionStatus = document.getElementById("connectionStatus");
+const SUPABASE_URL =
+    "https://scjmrpfuybnejbasfzqm.supabase.co";
 
-/* =========================================================
-   DATE UTILS
-========================================================= */
-function getTodayThailand() {
-    const now = new Date();
-    const parts = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Asia/Bangkok",
-        year: "numeric", month: "2-digit", day: "2-digit"
-    }).formatToParts(now);
-    let y = "", m = "", d = "";
-    parts.forEach(p => {
-        if (p.type === "year") y = p.value;
-        if (p.type === "month") m = p.value;
-        if (p.type === "day") d = p.value;
-    });
-    return `${y}-${m}-${d}`;
+const SUPABASE_KEY =
+    "sb_publishable_Bsv9RezOrhGXSco9X-SA4g_FAWkS4wZ";
+
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+
+const LUX_TO_PPFD =
+    0.0185;
+
+const TIME_ZONE =
+    "Asia/Bangkok";
+
+const PAGE_SIZE =
+    1000;
+
+
+// ============================================================
+// GLOBAL VARIABLES
+// ============================================================
+
+let selectedGreenhouseID =
+    null;
+
+let selectedSensorID =
+    null;
+
+let selectedSensorCode =
+    "";
+
+let selectedDate =
+    null;
+
+let sensorList =
+    [];
+
+let greenhouseList =
+    [];
+
+let historyData =
+    [];
+
+let latestData =
+    null;
+
+let autoRefreshTimer =
+    null;
+
+let historyLoading =
+    false;
+
+let latestLoading =
+    false;
+
+
+// ============================================================
+// INCREMENTAL HISTORY VARIABLES
+// ============================================================
+
+let historyLastTimestamp =
+    null;
+
+let historyInitialized =
+    false;
+
+let historySensorID =
+    null;
+
+let historyDate =
+    null;
+
+
+// ============================================================
+// DOM READY
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
+
+        console.log(
+            "Dashboard starting..."
+        );
+
+        initializeDate();
+
+        setupEvents();
+
+        await loadGreenhouses();
+
+        startAutoRefresh();
+
+    }
+);
+
+
+// ============================================================
+// INITIALIZE DATE
+// ============================================================
+
+function initializeDate() {
+
+    const today =
+        getTodayThailand();
+
+    selectedDate =
+        today;
+
+    document.getElementById(
+        "dateSelect"
+    ).value =
+        today;
+
 }
 
-function getUTCDateRange(thaiDate) {
-    const start = new Date(`${thaiDate}T00:00:00+07:00`);
-    const nextDay = new Date(start);
-    nextDay.setUTCDate(nextDay.getUTCDate() + 1);
-    return { start: start.toISOString(), end: nextDay.toISOString() };
+
+// ============================================================
+// RESET HISTORY STATE
+// ============================================================
+
+function resetHistoryState() {
+
+    historyData =
+        [];
+
+    historyLastTimestamp =
+        null;
+
+    historyInitialized =
+        false;
+
+    historySensorID =
+        null;
+
+    historyDate =
+        null;
+
 }
 
-/* =========================================================
-   SUPABASE FETCH
-========================================================= */
-async function fetchSupabase(url, options = {}) {
-    const response = await fetch(url, {
-        ...options,
-        headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": "Bearer " + SUPABASE_KEY,
-            "Content-Type": "application/json",
-            ...(options.headers || {})
+
+// ============================================================
+// SETUP EVENTS
+// ============================================================
+
+function setupEvents() {
+
+
+    document.getElementById(
+        "greenhouseSelect"
+    ).addEventListener(
+        "change",
+        async function () {
+
+            selectedGreenhouseID =
+                this.value
+                    ? Number(this.value)
+                    : null;
+
+
+            console.log(
+                "Greenhouse changed:",
+                selectedGreenhouseID
+            );
+
+
+            resetHistoryState();
+
+
+            await loadSensors();
+
         }
-    });
-    if (!response.ok) throw new Error("Supabase Error: " + response.statusText);
-    return await response.json();
+    );
+
+
+    document.getElementById(
+        "sensorSelect"
+    ).addEventListener(
+        "change",
+        async function () {
+
+            selectedSensorID =
+                this.value
+                    ? Number(this.value)
+                    : null;
+
+
+            const sensor =
+                sensorList.find(
+                    s =>
+                        Number(s.id)
+                        === selectedSensorID
+                );
+
+
+            selectedSensorCode =
+                sensor
+                    ? sensor.sensor_code
+                    : "";
+
+
+            document.getElementById(
+                "sensorValue"
+            ).textContent =
+                selectedSensorCode || "-";
+
+
+            console.log(
+                "Sensor changed:",
+                selectedSensorID
+            );
+
+
+            resetHistoryState();
+
+
+            await refreshAll();
+
+        }
+    );
+
+
+    document.getElementById(
+        "dateSelect"
+    ).addEventListener(
+        "change",
+        async function () {
+
+            selectedDate =
+                this.value;
+
+
+            console.log(
+                "Date changed:",
+                selectedDate
+            );
+
+
+            resetHistoryState();
+
+
+            await refreshAll();
+
+        }
+    );
+
+
+    document.getElementById(
+        "refreshSelect"
+    ).addEventListener(
+        "change",
+        function () {
+
+            startAutoRefresh();
+
+        }
+    );
+
 }
 
-async function fetchSensorHistoryForSensor(sensorId) {
-    if (!sensorId || !selectedDate) return [];
-    const range = getUTCDateRange(selectedDate);
-    let allData = [];
-    let start = 0;
+
+// ============================================================
+// GET TODAY IN THAILAND
+// ============================================================
+
+function getTodayThailand() {
+
+    return new Intl.DateTimeFormat(
+        "en-CA",
+        {
+            timeZone: TIME_ZONE,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }
+    ).format(
+        new Date()
+    );
+
+}
+
+
+// ============================================================
+// THAI DATE → UTC RANGE
+// ============================================================
+
+function getUTCDateRange(
+    thaiDate
+) {
+
+    const start =
+        new Date(
+            `${thaiDate}T00:00:00+07:00`
+        );
+
+
+    const end =
+        new Date(start);
+
+
+    end.setUTCDate(
+        end.getUTCDate() + 1
+    );
+
+
+    return {
+
+        start:
+            start.toISOString(),
+
+        end:
+            end.toISOString()
+
+    };
+
+}
+
+
+// ============================================================
+// LOAD GREENHOUSES
+// ============================================================
+
+async function loadGreenhouses() {
+
+    const select =
+        document.getElementById(
+            "greenhouseSelect"
+        );
+
+
+    select.innerHTML =
+        '<option value="">Loading...</option>';
+
+
+    try {
+
+        const url =
+            `${SUPABASE_URL}/rest/v1/greenhouse` +
+            `?select=id,greenhouse_code,greenhouse_name` +
+            `&order=id.asc`;
+
+
+        console.log(
+            "Loading greenhouse:",
+            url
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`,
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    cache:
+                        "no-store"
+
+                }
+            );
+
+
+        const text =
+            await response.text();
+
+
+        console.log(
+            "Greenhouse HTTP:",
+            response.status
+        );
+
+
+        console.log(
+            "Greenhouse response:",
+            text
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}: ${text}`
+            );
+
+        }
+
+
+        const data =
+            JSON.parse(text);
+
+
+        greenhouseList =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        select.innerHTML =
+            "";
+
+
+        if (
+            greenhouseList.length
+            === 0
+        ) {
+
+            select.innerHTML =
+                '<option value="">No greenhouse</option>';
+
+            return;
+
+        }
+
+
+        greenhouseList.forEach(
+            greenhouse => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    greenhouse.id;
+
+
+                option.textContent =
+                    greenhouse.greenhouse_name
+                        ? `${greenhouse.greenhouse_code} - ${greenhouse.greenhouse_name}`
+                        : greenhouse.greenhouse_code;
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        selectedGreenhouseID =
+            greenhouseList[0].id;
+
+
+        select.value =
+            selectedGreenhouseID;
+
+
+        console.log(
+            "Selected greenhouse:",
+            selectedGreenhouseID
+        );
+
+
+        await loadSensors();
+
+    }
+    catch (error) {
+
+        console.error(
+            "loadGreenhouses() ERROR:",
+            error
+        );
+
+
+        select.innerHTML =
+            '<option value="">Load error</option>';
+
+
+        setStatus(
+            "Greenhouse loading error",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD SENSORS
+// ============================================================
+
+async function loadSensors() {
+
+    const select =
+        document.getElementById(
+            "sensorSelect"
+        );
+
+
+    select.innerHTML =
+        '<option value="">Loading...</option>';
+
+
+    if (
+        !selectedGreenhouseID
+    ) {
+
+        select.innerHTML =
+            '<option value="">No greenhouse</option>';
+
+        return;
+
+    }
+
+
+    try {
+
+        const url =
+            `${SUPABASE_URL}/rest/v1/sensor` +
+            `?select=id,sensor_code,greenhouse_id,sensor_type,description` +
+            `&greenhouse_id=eq.${selectedGreenhouseID}` +
+            `&order=id.asc`;
+
+
+        console.log(
+            "Loading sensors:",
+            url
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`,
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    cache:
+                        "no-store"
+
+                }
+            );
+
+
+        const text =
+            await response.text();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}: ${text}`
+            );
+
+        }
+
+
+        const data =
+            JSON.parse(text);
+
+
+        sensorList =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        select.innerHTML =
+            "";
+
+
+        if (
+            sensorList.length
+            === 0
+        ) {
+
+            select.innerHTML =
+                '<option value="">No sensor</option>';
+
+
+            selectedSensorID =
+                null;
+
+
+            return;
+
+        }
+
+
+        sensorList.forEach(
+            sensor => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    sensor.id;
+
+
+                option.textContent =
+                    sensor.description
+                        ? `${sensor.sensor_code} - ${sensor.description}`
+                        : sensor.sensor_code;
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        selectedSensorID =
+            sensorList[0].id;
+
+
+        selectedSensorCode =
+            sensorList[0].sensor_code;
+
+
+        select.value =
+            selectedSensorID;
+
+
+        document.getElementById(
+            "sensorValue"
+        ).textContent =
+            selectedSensorCode;
+
+
+        console.log(
+            "Selected sensor:",
+            selectedSensorID
+        );
+
+
+        resetHistoryState();
+
+
+        await refreshAll();
+
+    }
+    catch (error) {
+
+        console.error(
+            "loadSensors() ERROR:",
+            error
+        );
+
+
+        select.innerHTML =
+            '<option value="">Load error</option>';
+
+
+        setStatus(
+            "Sensor loading error",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD LATEST
+// ============================================================
+
+async function loadLatest() {
+
+    if (
+        !selectedSensorID
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        latestLoading
+    ) {
+
+        return;
+
+    }
+
+
+    latestLoading =
+        true;
+
+
+    try {
+
+        const url =
+            `${SUPABASE_URL}/rest/v1/sensor_data` +
+            `?select=*` +
+            `&sensor_id=eq.${selectedSensorID}` +
+            `&order=timestamp.desc` +
+            `&limit=1`;
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`,
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    cache:
+                        "no-store"
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const text =
+                await response.text();
+
+
+            throw new Error(
+                `HTTP ${response.status}: ${text}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !Array.isArray(data)
+            ||
+            data.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        latestData =
+            data[0];
+
+
+        updateLatestDisplay(
+            latestData
+        );
+
+
+        console.log(
+            "Latest updated:",
+            latestData.timestamp
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "loadLatest() ERROR:",
+            error
+        );
+
+    }
+    finally {
+
+        latestLoading =
+            false;
+
+    }
+
+}
+
+
+// ============================================================
+// UPDATE LATEST DISPLAY
+// ============================================================
+
+function updateLatestDisplay(
+    data
+) {
+
+    const lux =
+        Number(data.lux);
+
+
+    const ppfd =
+        Number(data.ppfd);
+
+
+    const dli =
+        Number(data.dli_today);
+
+
+    const deltaDLI =
+        Number(data.delta_dli);
+
+
+    document.getElementById(
+        "currentLux"
+    ).textContent =
+        Number.isFinite(lux)
+            ? lux.toFixed(2)
+            : "-";
+
+
+    document.getElementById(
+        "detailLux"
+    ).textContent =
+        Number.isFinite(lux)
+            ? `${lux.toFixed(2)} lux`
+            : "-";
+
+
+    document.getElementById(
+        "currentPPFD"
+    ).textContent =
+        Number.isFinite(ppfd)
+            ? ppfd.toFixed(2)
+            : "-";
+
+
+    document.getElementById(
+        "detailPPFD"
+    ).textContent =
+        Number.isFinite(ppfd)
+            ? `${ppfd.toFixed(2)} µmol/m²/s`
+            : "-";
+
+
+    document.getElementById(
+        "currentDLI"
+    ).textContent =
+        Number.isFinite(dli)
+            ? dli.toFixed(4)
+            : "-";
+
+
+    document.getElementById(
+        "latestDeltaDLI"
+    ).textContent =
+        Number.isFinite(deltaDLI)
+            ? deltaDLI.toFixed(8)
+            : "-";
+
+
+    document.getElementById(
+        "lastUpdate"
+    ).textContent =
+        formatThaiTimestamp(
+            data.timestamp
+        );
+
+}
+
+
+// ============================================================
+// FETCH SENSOR HISTORY
+// ============================================================
+//
+// incremental = false
+//      → โหลดข้อมูลทั้งวัน
+//
+// incremental = true
+//      → โหลดเฉพาะข้อมูลหลัง timestamp ล่าสุด
+//
+// ============================================================
+
+async function fetchSensorHistory(
+    incremental = false
+) {
+
+    if (
+        !selectedSensorID
+        ||
+        !selectedDate
+    ) {
+
+        return [];
+
+    }
+
+
+    const range =
+        getUTCDateRange(
+            selectedDate
+        );
+
+
+    // ========================================================
+    // INCREMENTAL MODE
+    // ========================================================
+
+    if (
+        incremental
+        &&
+        historyLastTimestamp
+        &&
+        historySensorID === selectedSensorID
+        &&
+        historyDate === selectedDate
+    ) {
+
+        const url =
+            `${SUPABASE_URL}/rest/v1/sensor_data` +
+            `?select=*` +
+            `&sensor_id=eq.${selectedSensorID}` +
+            `&timestamp=gt.${encodeURIComponent(historyLastTimestamp)}` +
+            `&timestamp=lt.${encodeURIComponent(range.end)}` +
+            `&order=timestamp.asc`;
+
+
+        console.log(
+            "Incremental history request:"
+        );
+
+
+        console.log(
+            historyLastTimestamp
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`,
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    cache:
+                        "no-store"
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const text =
+                await response.text();
+
+
+            throw new Error(
+                `HTTP ${response.status}: ${text}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Incremental records:",
+            data.length
+        );
+
+
+        return Array.isArray(data)
+            ? data
+            : [];
+
+    }
+
+
+    // ========================================================
+    // FULL HISTORY MODE
+    // ========================================================
+
+    let allData =
+        [];
+
+    let offset =
+        0;
+
 
     while (true) {
-        const url = `${SUPABASE_URL}/rest/v1/sensor_data?select=*&sensor_id=eq.${sensorId}&timestamp=gte.${encodeURIComponent(range.start)}&timestamp=lt.${encodeURIComponent(range.end)}&order=timestamp.asc`;
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY,
-                "Content-Type": "application/json",
-                "Range": `${start}-${start + PAGE_SIZE - 1}`
-            }
-        });
-        if (!response.ok) break;
-        const page = await response.json();
-        if (!Array.isArray(page) || page.length === 0) break;
-        allData = allData.concat(page);
-        if (page.length < PAGE_SIZE) break;
-        start += PAGE_SIZE;
+
+        const url =
+            `${SUPABASE_URL}/rest/v1/sensor_data` +
+            `?select=*` +
+            `&sensor_id=eq.${selectedSensorID}` +
+            `&timestamp=gte.${encodeURIComponent(range.start)}` +
+            `&timestamp=lt.${encodeURIComponent(range.end)}` +
+            `&order=timestamp.asc`;
+
+
+        console.log(
+            "Full history request:",
+            offset
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`,
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Range":
+                            `${offset}-${offset + PAGE_SIZE - 1}`,
+
+                        "Prefer":
+                            "count=exact"
+
+                    },
+
+                    cache:
+                        "no-store"
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const text =
+                await response.text();
+
+
+            throw new Error(
+                `HTTP ${response.status}: ${text}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !Array.isArray(data)
+            ||
+            data.length === 0
+        ) {
+
+            break;
+
+        }
+
+
+        allData =
+            allData.concat(
+                data
+            );
+
+
+        console.log(
+            "History page:",
+            data.length,
+            "Total:",
+            allData.length
+        );
+
+
+        if (
+            data.length
+            < PAGE_SIZE
+        ) {
+
+            break;
+
+        }
+
+
+        offset +=
+            PAGE_SIZE;
+
+
+        if (
+            allData.length
+            >= 100000
+        ) {
+
+            console.warn(
+                "History limit reached."
+            );
+
+            break;
+
+        }
+
     }
 
-    // คำนวณ DLI ใหม่ที่ Reset เป็น 0 ในวันนั้นเสมอ (Integration)
-    let accumulatedDLI = 0;
-    for (let i = 0; i < allData.length; i++) {
-        const currentPPFD = Number(allData[i].ppfd || (allData[i].lux * LUX_TO_PPFD) || 0);
-        if (i === 0) {
-            allData[i].calc_dli = 0;
-        } else {
-            const prevTime = new Date(allData[i - 1].timestamp).getTime();
-            const currTime = new Date(allData[i].timestamp).getTime();
-            const dtSeconds = (currTime - prevTime) / 1000;
-            if (dtSeconds > 0 && dtSeconds < 3600) { // ละเว้นหากข้อมูลขาดหายเกิน 1 ชั่วโมง
-                const prevPPFD = Number(allData[i - 1].ppfd || (allData[i - 1].lux * LUX_TO_PPFD) || 0);
-                const avgPPFD = (prevPPFD + currentPPFD) / 2;
-                accumulatedDLI += (avgPPFD * dtSeconds) / 1000000;
-            }
-            allData[i].calc_dli = accumulatedDLI;
-        }
-    }
+
     return allData;
+
 }
 
-/* =========================================================
-   DATA LOADERS
-========================================================= */
-async function loadGreenhouses() {
-    const url = `${SUPABASE_URL}/rest/v1/greenhouse?select=id,greenhouse_code,greenhouse_name&order=id.asc`;
-    const data = await fetchSupabase(url);
-    greenhouseSelect.innerHTML = "";
-    if (!data || data.length === 0) return;
 
-    data.forEach(g => {
-        const opt = document.createElement("option");
-        opt.value = g.id;
-        opt.textContent = g.greenhouse_name ? `${g.greenhouse_code} - ${g.greenhouse_name}` : g.greenhouse_code;
-        greenhouseSelect.appendChild(opt);
-    });
+// ============================================================
+// LOAD HISTORY + UPDATE GRAPH
+// ============================================================
 
-    selectedGreenhouseID = Number(data[0].id);
-    await loadSensors(selectedGreenhouseID);
-}
+async function loadHistoryAndUpdate(
+    forceFullReload = false
+) {
 
-async function loadSensors(greenhouseID) {
-    const url = `${SUPABASE_URL}/rest/v1/sensor?select=id,sensor_code,sensor_type,description&greenhouse_id=eq.${greenhouseID}&order=id.asc`;
-    greenhouseSensors = await fetchSupabase(url);
-    sensorSelect.innerHTML = "";
+    if (
+        !selectedSensorID
+        ||
+        !selectedDate
+    ) {
 
-    if (!greenhouseSensors || greenhouseSensors.length === 0) {
-        sensorSelect.innerHTML = '<option value="">No sensor</option>';
-        selectedSensorID = null;
-        clearDashboard();
         return;
+
     }
 
-    greenhouseSensors.forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s.id;
-        opt.dataset.code = s.sensor_code;
-        opt.textContent = s.description ? `${s.sensor_code} - ${s.description}` : s.sensor_code;
-        sensorSelect.appendChild(opt);
-    });
 
-    selectedSensorID = Number(greenhouseSensors[0].id);
-    selectedSensorCode = greenhouseSensors[0].sensor_code;
-    await loadHistoryAndUpdate();
-}
+    if (
+        historyLoading
+    ) {
 
-async function loadAllSensorsHistory() {
-    sensorsHistoryMap = {};
-    if (chartMode === "single") {
-        if (selectedSensorID) {
-            sensorsHistoryMap[selectedSensorID] = await fetchSensorHistoryForSensor(selectedSensorID);
-        }
-    } else {
-        // Compare Mode: โหลดข้อมูลของทุกเซนเซอร์
-        for (const s of greenhouseSensors) {
-            sensorsHistoryMap[s.id] = await fetchSensorHistoryForSensor(s.id);
-        }
-    }
-    updateDashboardUI();
-}
+        console.log(
+            "History request already running."
+        );
 
-/* =========================================================
-   UI & METRICS
-========================================================= */
-function updateDashboardUI() {
-    const activeData = sensorsHistoryMap[selectedSensorID] || [];
+        return;
 
-    // อัปเดต สถิติประจำวัน
-    if (activeData.length > 0) {
-        const luxes = activeData.map(r => Number(r.lux || 0));
-        const ppfds = activeData.map(r => Number(r.ppfd || (r.lux * LUX_TO_PPFD) || 0));
-        
-        const minL = Math.min(...luxes), maxL = Math.max(...luxes), avgL = luxes.reduce((a,b)=>a+b,0)/luxes.length;
-        const minP = Math.min(...ppfds), maxP = Math.max(...ppfds), avgP = ppfds.reduce((a,b)=>a+b,0)/ppfds.length;
-
-        setText("luxMin", minL.toFixed(2));
-        setText("luxAvg", avgL.toFixed(2));
-        setText("luxMax", maxL.toFixed(2));
-        setText("ppfdMin", minP.toFixed(2));
-        setText("ppfdAvg", avgP.toFixed(2));
-        setText("ppfdMax", maxP.toFixed(2));
-
-        const lastRow = activeData[activeData.length - 1];
-        setText("luxValue", Number(lastRow.lux || 0).toFixed(2));
-        setText("ppfdValue", Number(lastRow.ppfd || (lastRow.lux * LUX_TO_PPFD)).toFixed(2));
-        setText("dliValue", Number(lastRow.calc_dli || 0).toFixed(4));
-        setText("detailTimestamp", formatThaiTimestamp(lastRow.timestamp));
-
-        if (activeData.length >= 2) {
-            const dDLI = (lastRow.calc_dli || 0) - (activeData[activeData.length - 2].calc_dli || 0);
-            setText("detailDeltaDLI", dDLI.toFixed(6));
-        } else {
-            setText("detailDeltaDLI", "--");
-        }
-    } else {
-        clearCurrentValues();
     }
 
-    let totalRecs = 0;
-    Object.values(sensorsHistoryMap).forEach(arr => totalRecs += arr.length);
-    setText("recordCount", totalRecs.toLocaleString());
-    setText("selectedDateText", formatThaiDate(selectedDate));
-    setText("sensorValue", chartMode === "compare" ? "Compare All" : selectedSensorCode);
 
-    drawLightChart();
-    drawDLIChart();
-}
+    historyLoading =
+        true;
 
-/* =========================================================
-   CHART DRAWING (SUPPORT MULTI-LINE OVERLAY)
-========================================================= */
-function drawLightChart() {
-    const canvas = document.getElementById("lightChart");
-    const ctx = canvas.getContext("2d");
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const width = rect.width, height = rect.height;
-    ctx.clearRect(0, 0, width, height);
 
-    let datasets = [];
-    let timeReferenceData = [];
+    try {
 
-    if (chartMode === "single") {
-        const data = sensorsHistoryMap[selectedSensorID] || [];
-        if (data.length > 0) {
-            timeReferenceData = data;
-            datasets.push({ label: `${selectedSensorCode} (Lux)`, values: data.map(r => Number(r.lux || 0)), color: "#1976d2" });
-            datasets.push({ label: `${selectedSensorCode} (PPFD Equiv)`, values: data.map(r => Number(r.ppfd || r.lux * LUX_TO_PPFD) / LUX_TO_PPFD), color: "#e67e22" });
-        }
-    } else {
-        greenhouseSensors.forEach((s, idx) => {
-            const data = sensorsHistoryMap[s.id] || [];
-            if (data.length > 0) {
-                if (data.length > timeReferenceData.length) timeReferenceData = data;
-                datasets.push({
-                    label: `${s.sensor_code} - ${s.description || 'Sensor'} (Lux)`,
-                    values: data.map(r => Number(r.lux || 0)),
-                    color: COLOR_PALETTE[idx % COLOR_PALETTE.length]
-                });
+        const startTime =
+            performance.now();
+
+
+        // ====================================================
+        // DETERMINE FULL / INCREMENTAL
+        // ====================================================
+
+        const needFullLoad =
+            forceFullReload
+            ||
+            !historyInitialized
+            ||
+            historySensorID !== selectedSensorID
+            ||
+            historyDate !== selectedDate;
+
+
+        // ====================================================
+        // FULL LOAD
+        // ====================================================
+
+        if (
+            needFullLoad
+        ) {
+
+            console.log(
+                "================================="
+            );
+
+
+            console.log(
+                "FULL HISTORY LOAD"
+            );
+
+
+            console.log(
+                "Sensor:",
+                selectedSensorID
+            );
+
+
+            console.log(
+                "Date:",
+                selectedDate
+            );
+
+
+            historyData =
+                await fetchSensorHistory(
+                    false
+                );
+
+
+            historyInitialized =
+                true;
+
+
+            historySensorID =
+                selectedSensorID;
+
+
+            historyDate =
+                selectedDate;
+
+
+            if (
+                historyData.length > 0
+            ) {
+
+                historyLastTimestamp =
+                    historyData[
+                        historyData.length - 1
+                    ].timestamp;
+
             }
-        });
-    }
+            else {
 
-    if (datasets.length === 0 || timeReferenceData.length === 0) {
-        drawNoData(ctx, width, height);
-        return;
-    }
+                historyLastTimestamp =
+                    null;
 
-    let maxValue = 0;
-    datasets.forEach(ds => {
-        const m = Math.max(...ds.values, 0);
-        if (m > maxValue) maxValue = m;
-    });
-    maxValue = (maxValue || 1) * 1.1;
-
-    const left = 65, right = 20, top = 35, bottom = 50;
-    const graphWidth = width - left - right, graphHeight = height - top - bottom;
-
-    drawGrid(ctx, width, height, left, right, top, bottom, graphWidth, graphHeight, maxValue, false);
-    drawTimeLabels(ctx, width, height, left, graphWidth, timeReferenceData);
-
-    datasets.forEach(ds => {
-        drawLine(ctx, ds.values, maxValue, left, top, graphWidth, graphHeight, ds.color);
-    });
-
-    drawLegend(ctx, left, datasets.map(d => ({ text: d.label, color: d.color })));
-}
-
-function drawDLIChart() {
-    const canvas = document.getElementById("dliChart");
-    const ctx = canvas.getContext("2d");
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const width = rect.width, height = rect.height;
-    ctx.clearRect(0, 0, width, height);
-
-    let datasets = [];
-    let timeReferenceData = [];
-
-    if (chartMode === "single") {
-        const data = sensorsHistoryMap[selectedSensorID] || [];
-        if (data.length > 0) {
-            timeReferenceData = data;
-            datasets.push({ label: `${selectedSensorCode} (DLI)`, values: data.map(r => Number(r.calc_dli || 0)), color: "#2e7d32" });
-        }
-    } else {
-        greenhouseSensors.forEach((s, idx) => {
-            const data = sensorsHistoryMap[s.id] || [];
-            if (data.length > 0) {
-                if (data.length > timeReferenceData.length) timeReferenceData = data;
-                datasets.push({
-                    label: `${s.sensor_code} (DLI)`,
-                    values: data.map(r => Number(r.calc_dli || 0)),
-                    color: COLOR_PALETTE[idx % COLOR_PALETTE.length]
-                });
             }
-        });
+
+
+            console.log(
+                "Full history loaded:",
+                historyData.length,
+                "records"
+            );
+
+        }
+
+
+        // ====================================================
+        // INCREMENTAL LOAD
+        // ====================================================
+
+        else {
+
+            console.log(
+                "================================="
+            );
+
+
+            console.log(
+                "INCREMENTAL HISTORY LOAD"
+            );
+
+
+            const newData =
+                await fetchSensorHistory(
+                    true
+                );
+
+
+            if (
+                newData.length > 0
+            ) {
+
+                historyData =
+                    historyData.concat(
+                        newData
+                    );
+
+
+                historyLastTimestamp =
+                    newData[
+                        newData.length - 1
+                    ].timestamp;
+
+
+                console.log(
+                    "New records:",
+                    newData.length
+                );
+
+
+                console.log(
+                    "Total history:",
+                    historyData.length
+                );
+
+            }
+            else {
+
+                console.log(
+                    "No new records."
+                );
+
+            }
+
+        }
+
+
+        // ====================================================
+        // UPDATE RECORD COUNT
+        // ====================================================
+
+        document.getElementById(
+            "recordCount"
+        ).textContent =
+            historyData.length.toLocaleString();
+
+
+        // ====================================================
+        // UPDATE STATISTICS
+        // ====================================================
+
+        updateDailyStatistics(
+            historyData
+        );
+
+
+        // ====================================================
+        // REDRAW LIGHT GRAPH
+        // ====================================================
+
+        drawLightChart(
+            historyData
+        );
+
+
+        // ====================================================
+        // REDRAW DLI GRAPH
+        // ====================================================
+
+        drawDLIChart(
+            historyData
+        );
+
+
+        // ====================================================
+        // PERFORMANCE
+        // ====================================================
+
+        const elapsed =
+            (
+                performance.now()
+                -
+                startTime
+            ).toFixed(0);
+
+
+        console.log(
+            `Graph updated in ${elapsed} ms`
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "loadHistoryAndUpdate() ERROR:",
+            error
+        );
+
+
+        setStatus(
+            "History loading error",
+            "error"
+        );
+
+    }
+    finally {
+
+        historyLoading =
+            false;
+
     }
 
-    if (datasets.length === 0 || timeReferenceData.length === 0) {
-        drawNoData(ctx, width, height);
+}
+
+
+// ============================================================
+// DAILY STATISTICS
+// ============================================================
+
+function updateDailyStatistics(
+    data
+) {
+
+    if (
+        !data
+        ||
+        data.length === 0
+    ) {
+
+        document.getElementById(
+            "luxMin"
+        ).textContent = "-";
+
+
+        document.getElementById(
+            "luxAvg"
+        ).textContent = "-";
+
+
+        document.getElementById(
+            "luxMax"
+        ).textContent = "-";
+
+
+        document.getElementById(
+            "ppfdMin"
+        ).textContent = "-";
+
+
+        document.getElementById(
+            "ppfdAvg"
+        ).textContent = "-";
+
+
+        document.getElementById(
+            "ppfdMax"
+        ).textContent = "-";
+
+
         return;
+
     }
 
-    let maxValue = 0;
-    datasets.forEach(ds => {
-        const m = Math.max(...ds.values, 0);
-        if (m > maxValue) maxValue = m;
-    });
-    maxValue = (maxValue || 1) * 1.1;
 
-    const left = 65, right = 20, top = 35, bottom = 50;
-    const graphWidth = width - left - right, graphHeight = height - top - bottom;
+    const luxValues =
+        data
+            .map(
+                row =>
+                    Number(row.lux)
+            )
+            .filter(
+                Number.isFinite
+            );
 
-    drawGrid(ctx, width, height, left, right, top, bottom, graphWidth, graphHeight, maxValue, true);
-    drawTimeLabels(ctx, width, height, left, graphWidth, timeReferenceData);
 
-    datasets.forEach(ds => {
-        drawLine(ctx, ds.values, maxValue, left, top, graphWidth, graphHeight, ds.color);
-    });
+    const ppfdValues =
+        data
+            .map(
+                row =>
+                    Number(row.ppfd)
+            )
+            .filter(
+                Number.isFinite
+            );
 
-    drawLegend(ctx, left, datasets.map(d => ({ text: d.label, color: d.color })));
-}
 
-/* =========================================================
-   CANVAS HELPERS
-========================================================= */
-function drawGrid(ctx, width, height, left, right, top, bottom, graphWidth, graphHeight, maxValue, isDLI) {
-    ctx.strokeStyle = "#dddddd"; ctx.lineWidth = 1;
-    const gridCount = 5;
-    for (let i = 0; i <= gridCount; i++) {
-        const y = top + graphHeight - (i / gridCount) * graphHeight;
-        ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(width - right, y); ctx.stroke();
-        ctx.fillStyle = "#666"; ctx.font = "12px Arial"; ctx.textAlign = "right";
-        const val = (maxValue * i) / gridCount;
-        ctx.fillText(isDLI ? val.toFixed(2) : val.toFixed(0), left - 8, y + 4);
+    if (
+        luxValues.length > 0
+    ) {
+
+        const luxMin =
+            Math.min(
+                ...luxValues
+            );
+
+
+        const luxMax =
+            Math.max(
+                ...luxValues
+            );
+
+
+        const luxAvg =
+            luxValues.reduce(
+                (a, b) =>
+                    a + b,
+                0
+            )
+            /
+            luxValues.length;
+
+
+        document.getElementById(
+            "luxMin"
+        ).textContent =
+            luxMin.toFixed(2);
+
+
+        document.getElementById(
+            "luxAvg"
+        ).textContent =
+            luxAvg.toFixed(2);
+
+
+        document.getElementById(
+            "luxMax"
+        ).textContent =
+            luxMax.toFixed(2);
+
     }
-}
 
-function drawTimeLabels(ctx, width, height, left, graphWidth, data) {
-    const pointCount = data.length;
-    const labelCount = Math.min(12, pointCount);
-    ctx.fillStyle = "#666"; ctx.font = "11px Arial"; ctx.textAlign = "center";
-    for (let i = 0; i < labelCount; i++) {
-        let idx = labelCount === 1 ? 0 : Math.round(i * (pointCount - 1) / (labelCount - 1));
-        const x = left + (idx / Math.max(pointCount - 1, 1)) * graphWidth;
-        ctx.fillText(formatThaiTime(data[idx].timestamp), x, height - 15);
+
+    if (
+        ppfdValues.length > 0
+    ) {
+
+        const ppfdMin =
+            Math.min(
+                ...ppfdValues
+            );
+
+
+        const ppfdMax =
+            Math.max(
+                ...ppfdValues
+            );
+
+
+        const ppfdAvg =
+            ppfdValues.reduce(
+                (a, b) =>
+                    a + b,
+                0
+            )
+            /
+            ppfdValues.length;
+
+
+        document.getElementById(
+            "ppfdMin"
+        ).textContent =
+            ppfdMin.toFixed(2);
+
+
+        document.getElementById(
+            "ppfdAvg"
+        ).textContent =
+            ppfdAvg.toFixed(2);
+
+
+        document.getElementById(
+            "ppfdMax"
+        ).textContent =
+            ppfdMax.toFixed(2);
+
     }
+
 }
 
-function drawLine(ctx, values, maxValue, left, top, graphWidth, graphHeight, lineColor) {
-    if (!values || values.length === 0) return;
+
+// ============================================================
+// DRAW LIGHT CHART
+// ============================================================
+
+function drawLightChart(
+    data
+) {
+
+    const canvas =
+        document.getElementById(
+            "lightChart"
+        );
+
+
+    const ctx =
+        prepareCanvas(
+            canvas
+        );
+
+
+    if (
+        !data
+        ||
+        data.length === 0
+    ) {
+
+        drawNoData(
+            ctx,
+            canvas
+        );
+
+        return;
+
+    }
+
+
+    const luxValues =
+        data.map(
+            row =>
+                Number(row.lux)
+        );
+
+
+    const ppfdEquivalent =
+        data.map(
+            row =>
+                Number(row.ppfd)
+                /
+                LUX_TO_PPFD
+        );
+
+
+    const maxValue =
+        Math.max(
+            ...luxValues,
+            ...ppfdEquivalent,
+            1
+        );
+
+
+    drawChartGrid(
+        ctx,
+        canvas,
+        maxValue
+    );
+
+
+    drawLine(
+        ctx,
+        canvas,
+        luxValues,
+        maxValue,
+        "#1976d2"
+    );
+
+
+    drawLine(
+        ctx,
+        canvas,
+        ppfdEquivalent,
+        maxValue,
+        "#e67e22"
+    );
+
+
+    drawXAxis(
+        ctx,
+        canvas,
+        data
+    );
+
+
+    drawLegend(
+        ctx,
+        canvas,
+        [
+            {
+                name: "Lux",
+                color: "#1976d2"
+            },
+            {
+                name: "PPFD Equivalent Lux",
+                color: "#e67e22"
+            }
+        ]
+    );
+
+}
+
+
+// ============================================================
+// DRAW DLI CHART
+// ============================================================
+
+function drawDLIChart(
+    data
+) {
+
+    const canvas =
+        document.getElementById(
+            "dliChart"
+        );
+
+
+    const ctx =
+        prepareCanvas(
+            canvas
+        );
+
+
+    if (
+        !data
+        ||
+        data.length === 0
+    ) {
+
+        drawNoData(
+            ctx,
+            canvas
+        );
+
+        return;
+
+    }
+
+
+    const values =
+        data.map(
+            row =>
+                Number(row.dli_today)
+        );
+
+
+    const maxValue =
+        Math.max(
+            ...values,
+            0.001
+        );
+
+
+    drawChartGrid(
+        ctx,
+        canvas,
+        maxValue
+    );
+
+
+    drawLine(
+        ctx,
+        canvas,
+        values,
+        maxValue,
+        "#2e7d32"
+    );
+
+
+    drawXAxis(
+        ctx,
+        canvas,
+        data
+    );
+
+
+    drawLegend(
+        ctx,
+        canvas,
+        [
+            {
+                name: "DLI",
+                color: "#2e7d32"
+            }
+        ]
+    );
+
+}
+
+
+// ============================================================
+// PREPARE CANVAS
+// ============================================================
+
+function prepareCanvas(
+    canvas
+) {
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const dpr =
+        window.devicePixelRatio
+        || 1;
+
+
+    canvas.width =
+        rect.width * dpr;
+
+
+    canvas.height =
+        rect.height * dpr;
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+
+    ctx.font =
+        "12px Arial";
+
+
+    return ctx;
+
+}
+
+
+// ============================================================
+// DRAW GRID
+// ============================================================
+
+function drawChartGrid(
+    ctx,
+    canvas,
+    maxValue
+) {
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        canvas.clientHeight;
+
+
+    const left =
+        60;
+
+
+    const right =
+        20;
+
+
+    const top =
+        25;
+
+
+    const bottom =
+        45;
+
+
+    ctx.strokeStyle =
+        "#e0e0e0";
+
+
+    ctx.lineWidth =
+        1;
+
+
+    const gridCount =
+        5;
+
+
+    for (
+        let i = 0;
+        i <= gridCount;
+        i++
+    ) {
+
+        const y =
+            top
+            +
+            (
+                height
+                -
+                top
+                -
+                bottom
+            )
+            *
+            i
+            /
+            gridCount;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            left,
+            y
+        );
+
+
+        ctx.lineTo(
+            width - right,
+            y
+        );
+
+
+        ctx.stroke();
+
+
+        const value =
+            maxValue
+            *
+            (
+                1
+                -
+                i / gridCount
+            );
+
+
+        ctx.fillStyle =
+            "#607d8b";
+
+
+        ctx.textAlign =
+            "right";
+
+
+        ctx.fillText(
+            formatNumber(
+                value
+            ),
+            left - 8,
+            y + 4
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// DRAW LINE
+// ============================================================
+
+function drawLine(
+    ctx,
+    canvas,
+    values,
+    maxValue,
+    lineColor
+) {
+
+    if (
+        !values
+        ||
+        values.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        canvas.clientHeight;
+
+
+    const left =
+        60;
+
+
+    const right =
+        20;
+
+
+    const top =
+        25;
+
+
+    const bottom =
+        45;
+
+
+    const chartWidth =
+        width
+        -
+        left
+        -
+        right;
+
+
+    const chartHeight =
+        height
+        -
+        top
+        -
+        bottom;
+
+
+    ctx.strokeStyle =
+        lineColor;
+
+
+    ctx.lineWidth =
+        2;
+
+
     ctx.beginPath();
-    values.forEach((val, idx) => {
-        const x = left + (idx / Math.max(values.length - 1, 1)) * graphWidth;
-        const y = top + graphHeight - (val / maxValue) * graphHeight;
-        if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    });
-    ctx.strokeStyle = lineColor;
-    ctx.lineWidth = 2;
+
+
+    values.forEach(
+        (
+            value,
+            index
+        ) => {
+
+            const x =
+                left
+                +
+                (
+                    values.length === 1
+                        ? chartWidth / 2
+                        : index
+                            /
+                            (
+                                values.length - 1
+                            )
+                            *
+                            chartWidth
+                );
+
+
+            const safeValue =
+                Number.isFinite(value)
+                    ? value
+                    : 0;
+
+
+            const y =
+                top
+                +
+                chartHeight
+                *
+                (
+                    1
+                    -
+                    (
+                        safeValue
+                        /
+                        maxValue
+                    )
+                );
+
+
+            if (
+                index === 0
+            ) {
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            }
+            else {
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+            }
+
+        }
+    );
+
+
     ctx.stroke();
+
 }
 
-function drawLegend(ctx, left, items) {
-    let x = left;
-    ctx.font = "12px Arial";
-    items.forEach(item => {
-        ctx.fillStyle = item.color;
-        ctx.fillRect(x, 8, 12, 12);
-        ctx.fillStyle = "#333";
-        ctx.textAlign = "left";
-        ctx.fillText(item.text, x + 16, 18);
-        x += 25 + (item.text.length * 6.5);
-    });
+
+// ============================================================
+// X AXIS
+// ============================================================
+
+function drawXAxis(
+    ctx,
+    canvas,
+    data
+) {
+
+    if (
+        data.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        canvas.clientHeight;
+
+
+    const left =
+        60;
+
+
+    const right =
+        20;
+
+
+    const bottom =
+        45;
+
+
+    ctx.fillStyle =
+        "#607d8b";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    const labelCount =
+        Math.min(
+            10,
+            data.length
+        );
+
+
+    for (
+        let i = 0;
+        i < labelCount;
+        i++
+    ) {
+
+        const index =
+            Math.floor(
+                i
+                *
+                (
+                    data.length - 1
+                )
+                /
+                Math.max(
+                    labelCount - 1,
+                    1
+                )
+            );
+
+
+        const x =
+            left
+            +
+            (
+                data.length === 1
+                    ? (
+                        width
+                        -
+                        left
+                        -
+                        right
+                    ) / 2
+                    : index
+                        /
+                        (
+                            data.length - 1
+                        )
+                        *
+                        (
+                            width
+                            -
+                            left
+                            -
+                            right
+                        )
+            );
+
+
+        const time =
+            formatThaiTime(
+                data[index].timestamp
+            );
+
+
+        ctx.fillText(
+            time,
+            x,
+            height - bottom + 20
+        );
+
+    }
+
 }
 
-function drawNoData(ctx, width, height) {
-    ctx.fillStyle = "#777"; ctx.font = "16px Arial"; ctx.textAlign = "center";
-    ctx.fillText("No data available", width / 2, height / 2);
+
+// ============================================================
+// LEGEND
+// ============================================================
+
+function drawLegend(
+    ctx,
+    canvas,
+    items
+) {
+
+    let x =
+        70;
+
+
+    const y =
+        12;
+
+
+    items.forEach(
+        item => {
+
+            ctx.fillStyle =
+                item.color;
+
+
+            ctx.fillRect(
+                x,
+                y - 8,
+                14,
+                3
+            );
+
+
+            ctx.fillStyle =
+                "#455a64";
+
+
+            ctx.textAlign =
+                "left";
+
+
+            ctx.fillText(
+                item.name,
+                x + 20,
+                y
+            );
+
+
+            x +=
+                20
+                +
+                ctx.measureText(
+                    item.name
+                ).width
+                +
+                30;
+
+        }
+    );
+
 }
 
-/* =========================================================
-   UTILITY & FORMATTING
-========================================================= */
-function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
+
+// ============================================================
+// NO DATA
+// ============================================================
+
+function drawNoData(
+    ctx,
+    canvas
+) {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.clientWidth,
+        canvas.clientHeight
+    );
+
+
+    ctx.fillStyle =
+        "#90a4ae";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.font =
+        "16px Arial";
+
+
+    ctx.fillText(
+        "No data",
+        canvas.clientWidth / 2,
+        canvas.clientHeight / 2
+    );
+
 }
 
-function clearCurrentValues() {
-    setText("luxValue", "--"); setText("ppfdValue", "--"); setText("dliValue", "--");
-    setText("detailDeltaDLI", "--"); setText("detailTimestamp", "--");
+
+// ============================================================
+// FORMAT NUMBER
+// ============================================================
+
+function formatNumber(
+    value
+) {
+
+    if (
+        !Number.isFinite(value)
+    ) {
+
+        return "0";
+
+    }
+
+
+    if (
+        value >= 1000
+    ) {
+
+        return Math.round(
+            value
+        ).toLocaleString();
+
+    }
+
+
+    if (
+        value >= 10
+    ) {
+
+        return value.toFixed(1);
+
+    }
+
+
+    return value.toFixed(3);
+
 }
 
-function clearDashboard() {
-    sensorsHistoryMap = {};
-    clearCurrentValues();
-    updateDashboardUI();
+
+// ============================================================
+// FORMAT THAI TIMESTAMP
+// ============================================================
+
+function formatThaiTimestamp(
+    timestamp
+) {
+
+    if (!timestamp) {
+
+        return "-";
+
+    }
+
+
+    const date =
+        new Date(timestamp);
+
+
+    return new Intl.DateTimeFormat(
+        "th-TH",
+        {
+            timeZone:
+                TIME_ZONE,
+
+            year:
+                "numeric",
+
+            month:
+                "2-digit",
+
+            day:
+                "2-digit",
+
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit",
+
+            second:
+                "2-digit"
+
+        }
+    ).format(
+        date
+    );
+
 }
 
-function formatThaiDate(dateString) {
-    if (!dateString) return "--";
-    return new Date(`${dateString}T00:00:00+07:00`).toLocaleDateString("th-TH", {
-        timeZone: "Asia/Bangkok", year: "numeric", month: "long", day: "numeric"
-    });
+
+// ============================================================
+// FORMAT THAI TIME
+// ============================================================
+
+function formatThaiTime(
+    timestamp
+) {
+
+    if (!timestamp) {
+
+        return "-";
+
+    }
+
+
+    const date =
+        new Date(timestamp);
+
+
+    return new Intl.DateTimeFormat(
+        "en-GB",
+        {
+            timeZone:
+                TIME_ZONE,
+
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit"
+
+        }
+    ).format(
+        date
+    );
+
 }
 
-function formatThaiTimestamp(timestamp) {
-    if (!timestamp) return "--";
-    return new Date(timestamp).toLocaleString("th-TH", {
-        timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit",
-        hour: "2-digit", minute: "2-digit", second: "2-digit"
-    });
+
+// ============================================================
+// REFRESH ALL
+// ============================================================
+
+async function refreshAll() {
+
+    console.log(
+        "================================="
+    );
+
+
+    console.log(
+        "REFRESH ALL"
+    );
+
+
+    console.log(
+        "Sensor:",
+        selectedSensorID
+    );
+
+
+    console.log(
+        "Date:",
+        selectedDate
+    );
+
+
+    console.log(
+        "Time:",
+        new Date().toISOString()
+    );
+
+
+    setStatus(
+        "Updating...",
+        "normal"
+    );
+
+
+    await loadLatest();
+
+
+    await loadHistoryAndUpdate();
+
+
+    setStatus(
+        "Connected",
+        "normal"
+    );
+
 }
 
-function formatThaiTime(timestamp) {
-    if (!timestamp) return "";
-    return new Date(timestamp).toLocaleTimeString("th-TH", {
-        timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit"
-    });
-}
 
-/* =========================================================
-   EVENTS & INITIALIZATION
-========================================================= */
-async function loadHistoryAndUpdate() {
+// ============================================================
+// MANUAL REFRESH
+// ============================================================
+
+async function manualRefresh() {
+
+    const button =
+        document.getElementById(
+            "refreshButton"
+        );
+
+
+    button.disabled =
+        true;
+
+
+    button.textContent =
+        "Updating...";
+
+
     try {
-        connectionStatus.textContent = "Loading data...";
-        await loadAllSensorsHistory();
-        connectionStatus.textContent = "Connected • Data updated";
-    } catch (e) {
-        console.error(e);
-        connectionStatus.textContent = "Connection Error";
+
+        /*
+         * Manual refresh:
+         * โหลดข้อมูลล่าสุดแบบ incremental
+         * ไม่จำเป็นต้องโหลดทั้งวันใหม่
+         */
+
+        await refreshAll();
+
     }
+    catch (error) {
+
+        console.error(
+            "Manual refresh error:",
+            error
+        );
+
+    }
+    finally {
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "Refresh";
+
+    }
+
 }
 
-greenhouseSelect.addEventListener("change", async function() {
-    selectedGreenhouseID = Number(this.value);
-    await loadSensors(selectedGreenhouseID);
-});
 
-sensorSelect.addEventListener("change", async function() {
-    selectedSensorID = Number(this.value);
-    const opt = this.options[this.selectedIndex];
-    if (opt) selectedSensorCode = opt.dataset.code || opt.textContent;
-    await loadHistoryAndUpdate();
-});
+// ============================================================
+// AUTO REFRESH
+// ============================================================
 
-chartModeSelect.addEventListener("change", async function() {
-    chartMode = this.value;
-    const sensorGroup = document.getElementById("sensorGroup");
-    if (chartMode === "compare") {
-        sensorGroup.style.opacity = "0.5";
-    } else {
-        sensorGroup.style.opacity = "1";
+function startAutoRefresh() {
+
+    if (
+        autoRefreshTimer
+    ) {
+
+        clearInterval(
+            autoRefreshTimer
+        );
+
+
+        autoRefreshTimer =
+            null;
+
     }
-    await loadHistoryAndUpdate();
-});
 
-dateSelect.addEventListener("change", async function() {
-    selectedDate = this.value;
-    await loadHistoryAndUpdate();
-});
 
-window.addEventListener("resize", () => {
-    drawLightChart();
-    drawDLIChart();
-});
+    const interval =
+        Number(
+            document.getElementById(
+                "refreshSelect"
+            ).value
+        );
 
-async function initialize() {
-    try {
-        connectionStatus.textContent = "Connecting to Supabase...";
-        selectedDate = getTodayThailand();
-        dateSelect.value = selectedDate;
-        await loadGreenhouses();
-    } catch (error) {
-        console.error("Initialization Error:", error);
-        connectionStatus.textContent = "Connection Error";
-    }
+
+    console.log(
+        `Auto refresh started: ${interval / 1000} seconds`
+    );
+
+
+    autoRefreshTimer =
+        setInterval(
+            async function () {
+
+                console.log(
+                    "================================="
+                );
+
+
+                console.log(
+                    "AUTO REFRESH:",
+                    new Date().toLocaleTimeString()
+                );
+
+
+                if (
+                    !selectedSensorID
+                ) {
+
+                    console.log(
+                        "No sensor selected."
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    // =========================================
+                    // 1. CURRENT VALUE
+                    // =========================================
+
+                    await loadLatest();
+
+
+                    // =========================================
+                    // 2. GRAPH
+                    // =========================================
+
+                    const today =
+                        getTodayThailand();
+
+
+                    if (
+                        selectedDate
+                        ===
+                        today
+                    ) {
+
+                        /*
+                         * ถ้าเป็นวันปัจจุบัน
+                         * จะใช้ incremental update
+                         */
+
+                        await loadHistoryAndUpdate();
+
+                    }
+
+
+                    setStatus(
+                        "Connected • Auto Refresh",
+                        "normal"
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "AUTO REFRESH ERROR:",
+                        error
+                    );
+
+
+                    setStatus(
+                        "Auto refresh error",
+                        "error"
+                    );
+
+                }
+
+            },
+            interval
+        );
+
 }
 
-setInterval(async () => {
-    if (selectedGreenhouseID) await loadHistoryAndUpdate();
-}, 60000);
 
-initialize();
+// ============================================================
+// STATUS
+// ============================================================
+
+function setStatus(
+    message,
+    type = "normal"
+) {
+
+    const box =
+        document.getElementById(
+            "statusBox"
+        );
+
+
+    const title =
+        document.getElementById(
+            "statusTitle"
+        );
+
+
+    const time =
+        document.getElementById(
+            "statusTime"
+        );
+
+
+    title.textContent =
+        message;
+
+
+    time.textContent =
+        `Last dashboard update: ${formatThaiTimestamp(new Date().toISOString())}`;
+
+
+    box.className =
+        "status";
+
+
+    if (
+        type === "error"
+    ) {
+
+        box.classList.add(
+            "error"
+        );
+
+    }
+    else if (
+        type === "warning"
+    ) {
+
+        box.classList.add(
+            "warning"
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// WINDOW RESIZE
+// ============================================================
+
+let resizeTimer =
+    null;
+
+
+window.addEventListener(
+    "resize",
+    function () {
+
+        clearTimeout(
+            resizeTimer
+        );
+
+
+        resizeTimer =
+            setTimeout(
+                function () {
+
+                    drawLightChart(
+                        historyData
+                    );
+
+
+                    drawDLIChart(
+                        historyData
+                    );
+
+                },
+                200
+            );
+
+    }
+);
+
+
+// ============================================================
+// PAGE VISIBILITY
+// ============================================================
+
+document.addEventListener(
+    "visibilitychange",
+    async function () {
+
+        if (
+            !document.hidden
+        ) {
+
+            console.log(
+                "Page visible again → refresh"
+            );
+
+
+            await loadLatest();
+
+
+            if (
+                selectedDate
+                ===
+                getTodayThailand()
+            ) {
+
+                /*
+                 * ถ้า browser ถูกเปิดค้างไว้
+                 * และกลับเข้ามาอีกครั้ง
+                 * ใช้ incremental update
+                 */
+
+                await loadHistoryAndUpdate();
+
+            }
+
+        }
+
+    }
+);
+
+
 </script>
 
 </body>
